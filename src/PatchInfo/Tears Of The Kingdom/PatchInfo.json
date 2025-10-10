@@ -1,16 +1,16 @@
 {
-    "Name" : "Tears Of The Kingdom",
-    "Mod_Version" : "2.7.1",
+    "Name" : "Tears Of The Kingdom 3.0.0",
+    "Mod_Version" : "Version 3.0.0",
     "ID" : "0100F2C0115B6000",
-    "ModName" : "!!!TOTK Optimizer",
-    "ModConfig" : "romfs/UltraCam/maxlastbreath.ini",
+    "ModName" : "!!!!TOTK Optimizer",
+    "ModConfig" : "UltraCam/TOTK/Config/maxlastbreath.ini",
     "Config" : "Options.json",
     "ModFolder" : "UltraCam",
-    "Versions" : ["1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.2.1"],
+    "Versions" : ["1.1.0", "1.1.1", "1.1.2", "1.2.0", "1.2.1", "1.4.0", "1.4.1", "1.4.2"],
     "benchmarks" : true,
-    "benchmarks_version" : 0,
-    "benchmarks_file" : "TOTKBenchmark.txt",
+    "benchmarks_version" : 2,
+    "benchmarks_file" : "UltraCam/TOTK/Benchmark",
     "EmulationScale" : false,
     "Cheats" : true,
-    "SD" : false
+    "SD" : true
 }

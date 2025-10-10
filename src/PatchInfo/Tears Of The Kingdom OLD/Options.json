@@ -1,0 +1,327 @@
+{
+  "Keys": {
+    "totk console": {
+      "Name": "Console IP",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": [ "127.0.0.1", "192.168.1.1" ],
+      "Values": [ "127.0.0.1", "192.168.1.1" ],
+      "Default": 0,
+      "Description": "Console IP for connecting to TOTK Ultracam.",
+      "Config_Class": [ "Console", "IP" ]
+    },
+    "fps": {
+      "Name": "FPS",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [ 20, 240 ],
+      "Type": "s32",
+      "Default": 60,
+      "Increments": 5,
+      "Description": "UltraCam Beyond New FPS setting.\nLet's you set to any FPS\nWARNING: SET TO 120 FPS FOR UNCAPPED.\nRecommended 30, 60 FPS caps for best FRAMETIMES.",
+      "Config_Class": [ "Resolution", "MaxFramerate" ]
+    },
+    "menu fps": {
+      "Name": "Menu FPS",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [ 20, 120 ],
+      "Type": "s32",
+      "Default": 60,
+      "Increments": 5,
+      "Description": "UltraCam Beyond NEW MENU FPS CAP. Set to your desire.",
+      "Config_Class": [ "Features", "MenuFPSLock" ]
+    },
+    "movie fps": {
+      "Name": "Movie FPS",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [ 30, 120 ],
+      "Type": "s32",
+      "Default": 30,
+      "Increments": 30,
+      "Description": "Should be set to 30 FPS, only touch if you desire to use 60 or 120FPS movie cap for a particular mod.\n(WARNING) it will also auto lock to 30, 60 or 120 FPS.",
+      "Config_Class": [ "Features", "MovieFPS" ]
+    },
+    "fov": {
+      "Name": "FOV",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [ 20, 120 ],
+      "Type": "s32",
+      "Default": 50,
+      "Increments": 5,
+      "Description": "UltraCam Beyond NEW FOV setting, allows you to set FOV to anything\nThis now also scales up everything related to FOV.",
+      "Config_Class": [ "Features", "Fov" ]
+    },
+    "vertical r stick": {
+      "Name": "V Camera Sensitivity",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 0.25, 3 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.25,
+      "Description": "Increase Vertical Camera Speed.",
+      "Config_Class": [ "Gameplay", "Stick_Vertical_Speed" ]
+    },
+    "horizontal r stick": {
+      "Name": "H Camera Sensitivity",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 0.25, 3 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.25,
+      "Description": "Increase Horizontal Camera Speed.",
+      "Config_Class": [ "Gameplay", "Stick_Horizontal_Speed" ]
+    },
+    "freecam sens": {
+      "Name": "Freecam Sensitivity",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 10, 100 ],
+      "Type": "s32",
+      "Default": 30,
+      "Increments": 5,
+      "Description": "Increase Freecam Sensitivity.",
+      "Config_Class": [ "UltraCam", "CameraSpeed" ]
+    },
+    "emu scale": {
+      "Name": "Emulator Scale",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [ 1.0, 8.0 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 1.0,
+      "Description": "Match with Emulator scale.",
+      "Config_Class": [ "Resolution", "EmuScale" ]
+    },
+    "freecam speed": {
+      "Name": "Freecam Speed",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 1, 20 ],
+      "Type": "s32",
+      "Default": 5,
+      "Increments": 1,
+      "Description": "Increase Camera Movement Speed.",
+      "Config_Class": [ "UltraCam", "Speed" ]
+    },
+    "time speed": {
+      "Name": "Time Speed",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 1, 100 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 5.0,
+      "Description": "Increase or decrease time speed\nistimeSlower bool acts as a decrease.",
+      "Config_Class": [ "Features", "TimeSpeed" ]
+    },
+    "ani smoothing": {
+      "Name": "Sequence Smoothing",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [ 0.10, 0.50 ],
+      "Type": "f32",
+      "Default": 0.25,
+      "Increments": 0.05,
+      "Description": "Animation Smoothing set to auto for now.",
+      "Config_Class": [ "UltraCam", "AnimationSmoothing" ]
+    },
+    "rsdbheap": {
+      "Name": "RSDB Heap size",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 1, 10 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.25,
+      "Description": "Increase RSDB heap size, useful for merging romfs mods..",
+      "Config_Class": [ "Heaps", "RSDB" ]
+    },
+    "gametexturesheap": {
+      "Name": "Textures Heap size",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [ 1, 4 ],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.25,
+      "Description": "(WARNING), don't touch unless you know what you are doing\nIncrease GameTextures heap size, useful for merging romfs mods..\nSHOULD only be used with 8gb EXTENDED MEMORY LAYOUT",
+      "Config_Class": [ "Heaps", "GameTextures" ]
+    },
+    "resolution": {
+      "Name": "Resolution",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [ "720p", "900p", "1080p", "1440p", "4k", "6k", "8k" ],
+      "Values": [ "1280x720", "1600x900", "1920x1080", "2560x1440", "3840x2160", "6144x3456", "7680x4320" ],
+      "Default": 2,
+      "Description": "UltraCam Beyond NEW Resolution Scaling uses internal resolution\nWARNING: ANYTHING OVER 1440P REQUIRES EXTENDED MEMORY",
+      "Config_Class": [ "Resolution", "Width", "Height" ]
+    },
+    "handheldwidth": {
+      "Name": "Handheld Width",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": [ "720p", "900p", "1080p", "1440p", "4k", "6k", "8k" ],
+      "Values": [ "1280", "1600", "1920", "2560", "3840", "6144", "7680" ],
+      "Default": 0,
+      "Description": "UltraCam Beyond handheld resolution, set to AUTO.",
+      "Config_Class": [ "Handheld", "Width" ]
+    },
+    "handheldheight": {
+      "Name": "Handheld Height",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": [ "720p", "900p", "1080p", "1440p", "4k", "6k", "8k" ],
+      "Values": [ "720", "900", "1080", "1440", "2160", "3456", "4320" ],
+      "Default": 0,
+      "Description": "UltraCam Beyond handheld resolution, set to AUTO.",
+      "Config_Class": [ "Handheld", "Height" ]
+    },
+    "shadow resolution": {
+      "Name": "Shadow Resolution",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [ "103x", "206x", "512x", "1024x", "1536x", "2048x", "3072x", "4096x", "8192x" ],
+      "Values": [ 103, 206, 512, 1024, 1536, 2048, 3072, 4096, 8192 ],
+      "Default": 3,
+      "Description": "UltraCam Beyond NEW SHADOW resolution setting let's you set shadows up to 8K\nWARNING: REQUIRES EXTENDED MEMORY LAYOUT FOR SHADOWS OVER 1536.",
+      "Config_Class": [ "Resolution", "ShadowResolution" ]
+    },
+    "render distance": {
+      "Name": "Render Distance",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [ "VERY LOW", "LOW", "MEDIUM", "DEFAULT", "(EXPERIMENTAL) HAS ISSUES"],
+      "Values": [ 1000, 5000, 12500, 25000, 35000 ],
+      "Default": 3,
+      "Description": "UltraCam Beyond Render Distance.\nDefault is 25000. Increased is 50000.\nMay see a small benefit on low, up to 20% fps.\nExpect the game to use fog like rendering Minecraft.",
+      "Config_Class": [ "Resolution", "RenderDistance" ]
+    },
+    "benchmark": {
+      "Name": "Benchmark Selection",
+      "Class": "dropdown",
+      "Section": "extra",
+      "Auto": false,
+      "Name_Values": [ "Kakariko", "Great Sky Island", "Lookout Landing", "Goron City", "Korok Forest" ],
+      "Values": [ 0, 1, 2, 3, 4 ],
+      "Default": 1,
+      "Description": "UltraCam Beyond preset default benchmark.\nTrigger when you press G",
+      "Config_Class": [ "Benchmark", "Benchmark" ]
+    },
+    "freecam": {
+      "Name": "FreeCam",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "UltraCam Beyond Freecam! NEWLY IMPROVED FREECAM from 2.0\nTurning this off will, not let you trigger freecam with controller.\n",
+      "Config_Class": [ "UltraCam", "TriggerWithController" ]
+    },
+    "handheldresolution": {
+      "Name": "Override Handheld Res",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "UltraCam Beyond overrides the resolution of handheld to docked.",
+      "Config_Class": [ "Handheld", "OverrideHandheld_Resolution" ]
+    },
+    "hide ui": {
+      "Name": "Auto Hide UI in FreeCam",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "UltraCam Beyond AUTO Hide UI, this will automatically hide the UI in freecam mode.",
+      "Config_Class": [ "UltraCam", "AutoHideUI" ]
+    },
+    "quality improvements": {
+      "Name": "Quality Improvements",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "UltraCam Beyond Quality Improvements. This disables FXAA, FSR and Dynamic Resolution\nWARNING: SHOULD ALWAYS BE TURNED ON WITH HIGH RESOLUTION",
+      "Config_Class": [ "Resolution", "QualityImprovements" ]
+    },
+    "depthoffield": {
+      "Name": "Remove Depth Of Field",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "UltraCam Beyond Remove Depth of Field.",
+      "Config_Class": [ "Resolution", "RemoveDepthOfField" ]
+    },
+    "lensflare": {
+      "Name": "Remove Lens flare",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "UltraCam Beyond Remove Lens Flare.",
+      "Config_Class": [ "Resolution", "RemoveLensflare" ]
+    },
+    "fog": {
+      "Name": "Improve Fog",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "UltraCam Beyond Remove Fog.",
+      "Config_Class": [ "Features", "DisableFog" ]
+    },
+    "fxaa": {
+      "Name": "Disable Fxaa",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Removes FXAA from the game itself.",
+      "Config_Class": [ "Resolution", "DisableFXAA" ]
+    },
+    "animationfadeout": {
+      "Name": "Last Keyframe Fadeout",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Improves the smoothness of the last Keyframe for UltraCam sequencer.",
+      "Config_Class": [ "UltraCam", "AnimationFadeout" ]
+    },
+    "slowtime": {
+      "Name": "Slow Time",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "UltraCam Beyond SlowTime.\n This is controlled by a time scale.",
+      "Config_Class": [ "Features", "IsTimeSlower" ]
+    }
+  }
+}

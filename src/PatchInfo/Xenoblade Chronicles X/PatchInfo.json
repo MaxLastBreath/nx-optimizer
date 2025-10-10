@@ -1,0 +1,16 @@
+{
+    "Name" : "Xenoblade Chronicles X 1.0",
+    "Mod_Version" : "1.0",
+    "ID" : "0100453019AA8000",
+    "ModName" : "!!!Xenoblade Optimizer",
+    "ModConfig" : "UltraCam/XBCX/Config/maxlastbreath.ini",
+    "Config" : "Options.json",
+    "ModFolder" : "UltraCam",
+    "Versions" : ["1.0.1", "1.0.2"],
+    "benchmarks" : false,
+    "benchmarks_version" : 2,
+    "benchmarks_file" : "UltraCam/XBCX/Benchmark",
+    "EmulationScale" : false,
+    "Cheats" : false,
+    "SD" : true
+}

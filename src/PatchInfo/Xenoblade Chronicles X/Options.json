@@ -1,0 +1,347 @@
+{
+    "Keys": {
+        "resolution": {
+            "Name": "Resolution",
+            "Class": "dropdown",
+            "Section": "main",
+            "Auto": false,
+            "Name_Values": [
+                "720p",
+                "900p",
+                "1080p",
+                "1440p",
+                "4k"
+            ],
+            "Values": [
+                "1280x720",
+                "1600x900",
+                "1920x1080",
+                "2560x1440",
+                "3840x2160"
+            ],
+            "Default": 2,
+            "Description": "UltraCam Resolution Scaling uses internal resolution\nWARNING: ANYTHING OVER 1080P REQUIRES EXTENDED MEMORY",
+            "Config_Class": [
+                "Resolution",
+                "Width",
+                "Height"
+            ]
+        },
+        "fps": {
+            "Name": "FPS",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [
+                20,
+                240
+            ],
+            "Type": "s32",
+            "Default": 60,
+            "Increments": 5,
+            "Description": "UltraCam New FPS setting.\nLet's you set to any FPS\nWARNING: SET TO 120 FPS FOR UNCAPPED.\nRecommended 30, 60 FPS caps for best FRAMETIMES.",
+            "Config_Class": [
+                "UltraCamFPS",
+                "MaxFPS"
+            ]
+        },
+        "fps buffer": {
+            "Name": "FPS Buffer",
+            "Class": "scale",
+            "Section": "extra",
+            "Auto": true,
+            "Values": [
+                1,
+                12
+            ],
+            "Type": "s32",
+            "Default": 8,
+            "Increments": 1,
+            "Description": "Leave to default 8.",
+            "Config_Class": [
+                "UltraCamFPS",
+                "Buffer"
+            ]
+        },
+        "movie fps": {
+            "Name": "Movie FPS",
+            "Class": "scale",
+            "Section": "extra",
+            "Auto": true,
+            "Values": [
+                30,
+                120
+            ],
+            "Type": "s32",
+            "Default": 30,
+            "Increments": 30,
+            "Description": "Should be set to 30 FPS, only touch if you desire to use 60 or 120FPS movie cap for a particular mod.\n(WARNING) it will also auto lock to 30, 60 or 120 FPS.",
+            "Config_Class": [
+                "UltraCamFPS",
+                "MovieFPS"
+            ]
+        },
+        "fov": {
+            "Name": "FOV",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [
+                20,
+                120
+            ],
+            "Type": "s32",
+            "Default": 40,
+            "Increments": 5,
+            "Description": "UltraCam FOV setting, allows you to set FOV to anything\nThis now also scales up everything related to FOV.",
+            "Config_Class": [
+                "Features",
+                "Fov"
+            ]
+        },
+        "freecam sens": {
+            "Name": "Freecam Sensitivity",
+            "Class": "scale",
+            "Section": "extra",
+            "Auto": false,
+            "Values": [
+                10,
+                100
+            ],
+            "Type": "s32",
+            "Default": 90,
+            "Increments": 5,
+            "Description": "Increase Freecam Sensitivity.",
+            "Config_Class": [
+                "UltraCam",
+                "CameraSpeed"
+            ]
+        },
+        "freecam speed": {
+            "Name": "Freecam Speed",
+            "Class": "scale",
+            "Section": "extra",
+            "Auto": false,
+            "Values": [
+                1,
+                20
+            ],
+            "Type": "s32",
+            "Default": 15,
+            "Increments": 1,
+            "Description": "Increase Camera Movement Speed.",
+            "Config_Class": [
+                "UltraCam",
+                "Speed"
+            ]
+        },
+        "ani smoothing": {
+            "Name": "Sequence Smoothing",
+            "Class": "scale",
+            "Section": "extra",
+            "Auto": true,
+            "Values": [
+                0.1,
+                0.5
+            ],
+            "Type": "f32",
+            "Default": 0.25,
+            "Increments": 0.05,
+            "Description": "Animation Smoothing set to auto for now.",
+            "Config_Class": [
+                "UltraCam",
+                "AnimationSmoothing"
+            ]
+        },
+        "handheldwidth": {
+            "Name": "Handheld Width",
+            "Class": "dropdown",
+            "Section": "main",
+            "Auto": true,
+            "Name_Values": [
+                "720p",
+                "900p",
+                "1080p",
+                "1440p",
+                "4k"
+            ],
+            "Values": [
+                "1280",
+                "1600",
+                "1920",
+                "2560",
+                "3840"
+            ],
+            "Default": 0,
+            "Description": "UltraCam handheld resolution, set to AUTO.",
+            "Config_Class": [
+                "Handheld",
+                "Width"
+            ]
+        },
+        "handheldheight": {
+            "Name": "Handheld Height",
+            "Class": "dropdown",
+            "Section": "main",
+            "Auto": true,
+            "Name_Values": [
+                "720p",
+                "900p",
+                "1080p",
+                "1440p",
+                "4k"
+            ],
+            "Values": [
+                "720",
+                "900",
+                "1080",
+                "1440",
+                "2160"
+            ],
+            "Default": 0,
+            "Description": "UltraCam handheld resolution, set to AUTO.",
+            "Config_Class": [
+                "Handheld",
+                "Height"
+            ]
+        },
+        "freecam": {
+            "Name": "FreeCam",
+            "Class": "bool",
+            "Section": "main",
+            "Auto": false,
+            "Default": true,
+            "Description": "UltraCam Freecam! NEWLY IMPROVED FREECAM from 2.0\nTurning this off will, not let you trigger freecam with controller.\n",
+            "Config_Class": [
+                "UltraCam",
+                "TriggerWithController"
+            ]
+        },
+        "dfps": {
+            "Name": "Dynamic FPS",
+            "Class": "bool",
+            "Section": "main",
+            "Auto": false,
+            "Default": true,
+            "Description": "UltraCam Dynamic Framerate.\n",
+            "Config_Class": [
+                "UltraCamFPS",
+                "DynamicFPS"
+            ]
+        },
+        "forcelod": {
+            "Name": "Force LOD",
+            "Class": "bool",
+            "Section": "main",
+            "Auto": false,
+            "Default": false,
+            "Description": "UltraCam Force Lods.\n",
+            "Config_Class": [
+                "Resolution",
+                "ChangeLevelOfDetail"
+            ]
+        },
+        "forceani": {
+            "Name": "Force Anisotrophy",
+            "Class": "bool",
+            "Section": "main",
+            "Auto": false,
+            "Default": false,
+            "Description": "UltraCam Force Anisotrophy Filtering.\n",
+            "Config_Class": [
+                "Resolution",
+                "ChangeAnisotropy"
+            ]
+        },
+        "mainsens": {
+            "Name": "Camera Sensitivity",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [
+                0.1,
+                5.0
+            ],
+            "Type": "f32",
+            "Default": 1,
+            "Increments": 0.1,
+            "Description": "Multiply main camera sensitivity.",
+            "Config_Class": [
+                "Features",
+                "MainCameraSensitivity"
+            ]
+        },
+        "lod": {
+            "Name": "Level of Detail",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [
+                -15,
+                15
+            ],
+            "Type": "s32",
+            "Default": 0,
+            "Increments": 1,
+            "Description": "Use with Force LOD setting. 15 will make the game look low quality.",
+            "Config_Class": [
+                "Resolution",
+                "LevelOfDetail"
+            ]
+        },
+        "anisotrophy": {
+            "Name": "Anisotrophy Filtering",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [
+                4,
+                16
+            ],
+            "Type": "s32",
+            "Default": 16,
+            "Increments": 5,
+            "Description": "Use with Force LOD setting. 15 will make the game look low quality.",
+            "Config_Class": [
+                "Resolution",
+                "AnistrophyLevel"
+            ]
+        },
+        "handheldresolution": {
+            "Name": "Override Handheld Res",
+            "Class": "bool",
+            "Section": "main",
+            "Auto": false,
+            "Default": false,
+            "Description": "UltraCam overrides the resolution of handheld to docked.",
+            "Config_Class": [
+                "Handheld",
+                "OverrideHandheld_Resolution"
+            ]
+        },
+        "hide ui": {
+            "Name": "Auto Hide UI in FreeCam",
+            "Class": "bool",
+            "Section": "extra",
+            "Auto": false,
+            "Default": true,
+            "Description": "UltraCam AUTO Hide UI, this will automatically hide the UI in freecam mode.",
+            "Config_Class": [
+                "UltraCam",
+                "AutoHideUI"
+            ]
+        },
+        "animationfadeout": {
+            "Name": "Last Keyframe Fadeout",
+            "Class": "bool",
+            "Section": "extra",
+            "Auto": false,
+            "Default": false,
+            "Description": "Improves the smoothness of the last Keyframe for UltraCam sequencer.",
+            "Config_Class": [
+                "UltraCam",
+                "AnimationFadeout"
+            ]
+        }
+    }
+}

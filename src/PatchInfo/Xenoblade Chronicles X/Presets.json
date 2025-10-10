@@ -1,0 +1,18 @@
+{
+  "Low (SWITCH)": {
+    "fps": 30,
+    "resolution": 1
+  },
+  "Low (PC)": {
+    "fps": 30,
+    "resolution": 2
+  },
+  "Medium (RECOMMENDED)": {
+    "fps": 60,
+    "shadow resolution": 3
+  },
+  "High": {
+    "fps": 60,
+    "resolution": 4
+  }
+}

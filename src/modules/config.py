@@ -122,6 +122,8 @@ def loadGameConfig(Manager, config):
                     PatchIndex = int(patch_default)
                     Manager.UserChoices[patch].set(patch_Names[PatchIndex])
                     continue
+            except (configparser.NoOptionError, KeyError):
+                pass
             continue
         if patch_class.lower() == "scale":
             # use name for tag accuracy
