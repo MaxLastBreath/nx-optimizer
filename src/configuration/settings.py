@@ -5,7 +5,7 @@ from modules.logger import log, superlog
 from modules.FrontEnd.Localization import Localization
 import configparser
 
-Version = "manager-3.1.6"
+Version = "manager-3.2.0"
 repo_url_raw = "https://github.com/MaxLastBreath/TOTK-mods"
 repo_url = "https://api.github.com/repos/MaxLastBreath/TOTK-mods"
 localconfig = "TOTKOptimizer.ini"

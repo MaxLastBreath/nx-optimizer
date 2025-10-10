@@ -276,7 +276,7 @@ class Benchmark:
         benchmark_result += Result
 
         if (cls.__version > 1):
-            benchmark_result += "\n\n**BETA BENCHMARK RESULT LIKELY TO BE LOWER**"
+            benchmark_result += "\n\n**UltraCam Version 3.0+ Benchmark, Result Might Be Lower**"
 
         log.info("Copied Benchmark Result")
             
