@@ -210,11 +210,13 @@ class Benchmark:
             cls.load_benchmark(None)
             log.warning(f"Benchmark File Not Found. {cls.__path}")
             return
-        
-        if (cls.__version == 0):
-            cls.__read_benchmark_file_v1()
-        else :
-            cls.__read_benchmark_file_v2()
+        try:
+            if (cls.__version == 0):
+                cls.__read_benchmark_file_v1()
+            else :
+                cls.__read_benchmark_file_v2()
+        except Exception as e:
+            log.error(f"Failed to Load Benchmark {e}")
         
         cls.load_benchmark(cls._selected_benchmark)
 
