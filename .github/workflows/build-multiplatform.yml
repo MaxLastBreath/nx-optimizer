@@ -23,7 +23,7 @@ jobs:
           os: windows-2022
           artifactsPath: ./src/dist/*.exe
         - name: Linux
-          os: ubuntu-20.04
+          os: ubuntu-22.04
           artifactsPath: ./src/dist/*.AppImage
         - name: MacOS Intel
           os: macos-13
