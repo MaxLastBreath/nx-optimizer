@@ -143,7 +143,7 @@ NX Optimizer and UltraCam aims to make Supported Switch Games run and behave bet
 - **Alciel** - Testing on Mobile
 - **TheL** - Testing on Switch, Server Moderation and Testing romfslite, provided video clips
 - **[Hayate Yoshida](https://www.youtube.com/@PureMadnessProductions)** - (JapanMan) Testing, Suggestions and Testing Aspect Ratios
-- **Colombianx** - Testing and Suggestions for FreeCam, Provided cool Freecam Clips
+- **[Colombianx](https://www.instagram.com/edithustotle/)** - Testing and Suggestions for FreeCam, Provided cool Freecam Clips
 - **נֶצַח** - Testing Public Release 3.0.0
 - **MetrosexualGarbodor** - Testing UC Xenoblade X
 - **[nvnprogram](https://github.com/nvnprogram)** - Insight on nvn API
