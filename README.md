@@ -123,7 +123,7 @@ NX Optimizer and UltraCam aims to make Supported Switch Games run and behave bet
 - [MaxLastBreath](https://linktr.ee/maxlastbreath)
 
 # Credits and Special Thanks To
-- **[MasaGratoR](https://github.com/masagrator)** - Help and Insight with romfslite
+- **[MasaGratoR](https://github.com/masagrator)** - Help and Insight with romfslite, Help with Blackscreen Fix (1.4.X), Help with Triple buffer
 - **[KeatonTheBot](https://linktr.ee/keatonthebot)** - Testing and Insight on Internal Resolution
 - **[Jake](https://github.com/JakeDystopia/)** - Testing
 - **[Pixelkiri](https://github.com/alexkiri/)** - Github Workflow
