@@ -1,0 +1,112 @@
+{
+  "Default": {
+    "UI": "Switch",
+    "First Person": false
+  },
+  "EXTREMELY Low": {
+    "fps": 30,
+    "fov": 50,
+    "shadow resolution": 0,
+    "resolution": 0,
+    "render distance": 0,
+    "quality improvements": false,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "Low (SWITCH)": {
+    "fps": 30,
+    "fov": 50,
+    "shadow resolution": 2,
+    "resolution": 1,
+    "render distance": 3,
+    "quality improvements": false,
+    "triple buffer": false,
+    "depthoffield": false,
+    "lensflare": true,
+    "fog": false,
+    "handheldresolution": false
+  },
+  "Medium (RECOMMENDED)": {
+    "fps": 60,
+    "fov": 50,
+    "shadow resolution": 3,
+    "resolution": 3,
+    "render distance": 3,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "High": {
+    "fps": 60,
+    "fov": 50,
+    "shadow resolution": 7,
+    "resolution": 4,
+    "render distance": 3,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "High Balanced": {
+    "fps": 60,
+    "fov": 50,
+    "shadow resolution": 3,
+    "resolution": 4,
+    "render distance": 3,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "Ultra (UNSTABLE)": {
+    "fps": 60,
+    "fov": 50,
+    "shadow resolution": 7,
+    "resolution": 5,
+    "render distance": 3,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "EXTREME (UNSTABLE)": {
+    "fps": 60,
+    "fov": 50,
+    "shadow resolution": 8,
+    "resolution": 6,
+    "render distance": 4,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "handheldresolution": true
+  },
+  "Steamdeck/Legion Go": {
+    "fps": 30,
+    "fov": 50,
+    "shadow resolution": 2,
+    "resolution": 2,
+    "render distance": 3,
+    "quality improvements": true,
+    "triple buffer": true,
+    "depthoffield": true,
+    "lensflare": true,
+    "fog": true,
+    "aspect ratio": 5,
+    "handheldresolution": true,
+    "Settings": "Steamdeck"
+  }
+}

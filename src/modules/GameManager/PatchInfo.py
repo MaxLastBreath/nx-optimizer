@@ -8,7 +8,7 @@ class PatchInfo:
     ID: str = "0100F2C0115B6000"
     ModName: str = "!!!TOTK Optimizer"
     ModVersion: str = "1.0"
-    Config: str = "UltraCam/maxlastbreath.ini"
+    ConfigPath: str = "UltraCam/maxlastbreath.ini"
     ModFolder: str = ""
     Versions: list[str] = []
     Cheats: bool = False
@@ -25,7 +25,7 @@ class PatchInfo:
         self.Name = self.Json(JsonFile, "Name") # mandatory
         self.Versions = self.Json(JsonFile, "Versions", [])
         self.ModName = self.Json(JsonFile, "ModName", "!!!NX-Optimizer")
-        self.Config = self.Json(JsonFile, "ModConfig")
+        self.ConfigPath = self.Json(JsonFile, "ModConfig")
         self.ModFolder = self.Json(JsonFile, "ModFolder")
         self.Cheats = self.Json(JsonFile, "Cheats", False)
         self.isSDconfig = self.Json(JsonFile, "SD", False)

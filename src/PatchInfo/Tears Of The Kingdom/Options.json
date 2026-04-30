@@ -1,572 +1,1386 @@
 {
-    "Keys": {
-        "totk console": {
-            "Name": "Console IP",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": true,
-            "Name_Values": [
-                "127.0.0.1",
-                "192.168.1.1"
-            ],
-            "Values": [
-                "127.0.0.1",
-                "192.168.1.1"
-            ],
-            "Default": 0,
-            "Description": "Console IP for connecting to TOTK Ultracam.",
-            "Config_Class": [
-                "Console",
-                "IP"
-            ]
-        },
-        "fps": {
-            "Name": "FPS",
-            "Class": "scale",
-            "Section": "main",
-            "Auto": false,
-            "Values": [
-                20,
-                240
-            ],
-            "Type": "s32",
-            "Default": 60,
-            "Increments": 5,
-            "Description": "UltraCam Calamity New FPS setting.\nLet's you set to any FPS\nWARNING: SET TO 120 FPS FOR UNCAPPED.\nRecommended 30, 60 FPS caps for best FRAMETIMES.",
-            "Config_Class": [
-                "UltraCamFPS",
-                "MaxFPS"
-            ]
-        },
-        "fps buffer": {
-            "Name": "FPS Buffer",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                1,
-                12
-            ],
-            "Type": "s32",
-            "Default": 8,
-            "Increments": 1,
-            "Description": "Leave to default 8.",
-            "Config_Class": [
-                "UltraCamFPS",
-                "Buffer"
-            ]
-        },
-        "menu fps": {
-            "Name": "Menu FPS",
-            "Class": "scale",
-            "Section": "main",
-            "Auto": false,
-            "Values": [
-                20,
-                120
-            ],
-            "Type": "s32",
-            "Default": 60,
-            "Increments": 5,
-            "Description": "UltraCam Calamity NEW MENU FPS CAP. Set to your desire.",
-            "Config_Class": [
-                "UltraCamFPS",
-                "MenuFPS"
-            ]
-        },
-        "movie fps": {
-            "Name": "Movie FPS",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": true,
-            "Values": [
-                30,
-                120
-            ],
-            "Type": "s32",
-            "Default": 30,
-            "Increments": 30,
-            "Description": "Should be set to 30 FPS, only touch if you desire to use 60 or 120FPS movie cap for a particular mod.\n(WARNING) it will also auto lock to 30, 60 or 120 FPS.",
-            "Config_Class": [
-                "UltraCamFPS",
-                "MovieFPS"
-            ]
-        },
-        "fov": {
-            "Name": "FOV",
-            "Class": "scale",
-            "Section": "main",
-            "Auto": false,
-            "Values": [
-                20,
-                120
-            ],
-            "Type": "s32",
-            "Default": 50,
-            "Increments": 5,
-            "Description": "UltraCam Calamity NEW FOV setting, allows you to set FOV to anything\nThis now also scales up everything related to FOV.",
-            "Config_Class": [
-                "Gameplay",
-                "Fov"
-            ]
-        },
-        "vertical r stick": {
-            "Name": "V Camera Sensitivity",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                0.25,
-                3
-            ],
-            "Type": "f32",
-            "Default": 1.0,
-            "Increments": 0.25,
-            "Description": "Increase Vertical Camera Speed.",
-            "Config_Class": [
-                "Gameplay",
-                "Stick_Vertical_Speed"
-            ]
-        },
-        "horizontal r stick": {
-            "Name": "H Camera Sensitivity",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                0.25,
-                3
-            ],
-            "Type": "f32",
-            "Default": 1.0,
-            "Increments": 0.25,
-            "Description": "Increase Horizontal Camera Speed.",
-            "Config_Class": [
-                "Gameplay",
-                "Stick_Horizontal_Speed"
-            ]
-        },
-        "freecam sens": {
-            "Name": "Freecam Sensitivity",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                10,
-                100
-            ],
-            "Type": "s32",
-            "Default": 90,
-            "Increments": 5,
-            "Description": "Increase Freecam Sensitivity.",
-            "Config_Class": [
-                "UltraCam",
-                "CameraSpeed"
-            ]
-        },
-        "freecam speed": {
-            "Name": "Freecam Speed",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                1,
-                20
-            ],
-            "Type": "s32",
-            "Default": 15,
-            "Increments": 1,
-            "Description": "Increase Camera Movement Speed.",
-            "Config_Class": [
-                "UltraCam",
-                "Speed"
-            ]
-        },
-        "time speed": {
-            "Name": "Time Speed",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": false,
-            "Values": [
-                1,
-                100
-            ],
-            "Type": "f32",
-            "Default": 1.0,
-            "Increments": 5.0,
-            "Description": "Increase or decrease time speed\nistimeSlower bool acts as a decrease.",
-            "Config_Class": [
-                "Features",
-                "TimeSpeed"
-            ]
-        },
-        "ani smoothing": {
-            "Name": "Sequence Smoothing",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": true,
-            "Values": [
-                0.1,
-                0.5
-            ],
-            "Type": "f32",
-            "Default": 0.25,
-            "Increments": 0.05,
-            "Description": "Animation Smoothing set to auto for now.",
-            "Config_Class": [
-                "UltraCam",
-                "AnimationSmoothing"
-            ]
-        },
-        "rsdbheap": {
-            "Name": "RSDB Heap size",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": true,
-            "Values": [
-                1,
-                10
-            ],
-            "Type": "f32",
-            "Default": 1.0,
-            "Increments": 0.25,
-            "Description": "Increase RSDB heap size, useful for merging romfs mods..",
-            "Config_Class": [
-                "Heaps",
-                "RSDB"
-            ]
-        },
-        "gametexturesheap": {
-            "Name": "Textures Heap size",
-            "Class": "scale",
-            "Section": "extra",
-            "Auto": true,
-            "Values": [
-                1,
-                4
-            ],
-            "Type": "f32",
-            "Default": 1.0,
-            "Increments": 0.25,
-            "Description": "(WARNING), don't touch unless you know what you are doing\nIncrease GameTextures heap size, useful for merging romfs mods..\nSHOULD only be used with 8gb EXTENDED MEMORY LAYOUT",
-            "Config_Class": [
-                "Heaps",
-                "GameTextures"
-            ]
-        },
-        "resolution": {
-            "Name": "Resolution",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": false,
-            "Name_Values": [
-                "720p",
-                "900p",
-                "1080p",
-                "1440p",
-                "4k",
-                "6k",
-                "8k"
-            ],
-            "Values": [
-                "1280x720",
-                "1600x900",
-                "1920x1080",
-                "2560x1440",
-                "3840x2160",
-                "6144x3456",
-                "7680x4320"
-            ],
-            "Default": 2,
-            "Description": "UltraCam Calamity NEW Resolution Scaling uses internal resolution\nWARNING: ANYTHING OVER 1440P REQUIRES EXTENDED MEMORY",
-            "Config_Class": [
-                "Resolution",
-                "Width",
-                "Height"
-            ]
-        },
-        "aspect": {
-            "Name": "Aspect Ratio",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": false,
-            "Name_Values": [
-                "16x9",
-                "16x10",
-                "20x9",
-                "21x9",
-                "21.5x9",
-                "32x9",
-                "4x4"
-            ],
-            "Values": [
-                [16, 9],
-                [16, 10],
-                [20, 9],
-                [21, 9],
-                [21.5, 9],
-                [32, 9],
-                [9, 9]
-            ],
-            "Default": 0,
-            "Description": "UltraCam TOTK Aspect Ratios\n",
-            "Config_Class": [
-                "Aspect",
-                "Width",
-                "Height"
-            ]
-        },
-        "handheldwidth": {
-            "Name": "Handheld Width",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": true,
-            "Name_Values": [
-                "720p",
-                "900p",
-                "1080p",
-                "1440p",
-                "4k",
-                "6k",
-                "8k"
-            ],
-            "Values": [
-                "1280",
-                "1600",
-                "1920",
-                "2560",
-                "3840",
-                "6144",
-                "7680"
-            ],
-            "Default": 0,
-            "Description": "UltraCam Calamity handheld resolution, set to AUTO.",
-            "Config_Class": [
-                "Handheld",
-                "Width"
-            ]
-        },
-        "handheldheight": {
-            "Name": "Handheld Height",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": true,
-            "Name_Values": [
-                "720p",
-                "900p",
-                "1080p",
-                "1440p",
-                "4k",
-                "6k",
-                "8k"
-            ],
-            "Values": [
-                "720",
-                "900",
-                "1080",
-                "1440",
-                "2160",
-                "3456",
-                "4320"
-            ],
-            "Default": 0,
-            "Description": "UltraCam Calamity handheld resolution, set to AUTO.",
-            "Config_Class": [
-                "Handheld",
-                "Height"
-            ]
-        },
-        "shadow resolution": {
-            "Name": "Shadow Resolution",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": false,
-            "Name_Values": [
-                "103x",
-                "206x",
-                "512x",
-                "1024x",
-                "1536x",
-                "2048x",
-                "3072x",
-                "4096x",
-                "8192x"
-            ],
-            "Values": [
-                103,
-                206,
-                512,
-                1024,
-                1536,
-                2048,
-                3072,
-                4096,
-                8192
-            ],
-            "Default": 3,
-            "Description": "UltraCam Calamity NEW SHADOW resolution setting let's you set shadows up to 8K\nWARNING: REQUIRES EXTENDED MEMORY LAYOUT FOR SHADOWS OVER 1536.",
-            "Config_Class": [
-                "Resolution",
-                "ShadowResolution"
-            ]
-        },
-        "render distance": {
-            "Name": "Render Distance",
-            "Class": "dropdown",
-            "Section": "main",
-            "Auto": false,
-            "Name_Values": [
-                "VERY LOW",
-                "LOW",
-                "MEDIUM",
-                "DEFAULT",
-                "(EXPERIMENTAL) HAS ISSUES"
-            ],
-            "Values": [
-                1000,
-                5000,
-                12500,
-                25000,
-                35000
-            ],
-            "Default": 3,
-            "Description": "UltraCam Calamity Render Distance.\nDefault is 25000. Increased is 50000.\nMay see a small benefit on low, up to 20% fps.\nExpect the game to use fog like rendering Minecraft.",
-            "Config_Class": [
-                "Resolution",
-                "RenderDistance"
-            ]
-        },
-        "dfps": {
-            "Name": "Dynamic FPS",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": true,
-            "Description": "UltraCam Dynamic Framerate.\n",
-            "Config_Class": [
-                "UltraCamFPS",
-                "DynamicFPS"
-            ]
-        },
-        "freecam": {
-            "Name": "FreeCam",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": true,
-            "Description": "UltraCam Calamity Freecam!\nTurning this off will, not let you trigger freecam with controller.\n",
-            "Config_Class": [
-                "UltraCam",
-                "TriggerWithController"
-            ]
-        },
-        "handheldresolution": {
-            "Name": "Override Handheld Res",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "UltraCam Calamity overrides the resolution of handheld to docked.",
-            "Config_Class": [
-                "Handheld",
-                "OverrideHandheld_Resolution"
-            ]
-        },
-        "hide ui": {
-            "Name": "Auto Hide UI in FreeCam",
-            "Class": "bool",
-            "Section": "extra",
-            "Auto": false,
-            "Default": true,
-            "Description": "UltraCam Calamity AUTO Hide UI, this will automatically hide the UI in freecam mode.",
-            "Config_Class": [
-                "UltraCam",
-                "AutoHideUI"
-            ]
-        },
-        "dynamicres": {
-            "Name": "Dynamic Resolution",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "UltraCam Calamity Dynamic Resolution. This enables Dynamic Resolution for the game itself\nWARNING: SHOULD ALWAYS BE TURNED OFF WITH HIGH RESOLUTION",
-            "Config_Class": [
-                "Resolution",
-                "QualityImprovements"
-            ]
-        },
-        "fxaa2": {
-            "Name": "Fxaa",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "Enable FXAA from the game itself.",
-            "Config_Class": [
-                "Resolution",
-                "FXAA"
-            ]
-        },
-        "fsr2": {
-            "Name": "FSR 1.0",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "Enable FSR from the game itself.",
-            "Config_Class": [
-                "Resolution",
-                "FSR"
-            ]
-        },
-        "fpsoverlay": {
-            "Name": "Framerate Overlay",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "Enable UltraCam FPS Overlay.",
-            "Config_Class": [
-                "UltraCamFPS",
-                "Overlay"
-            ]
-        },
-        "autoconnectconsole": {
-            "Name": "Allow UC Console",
-            "Class": "bool",
-            "Section": "main",
-            "Auto": false,
-            "Default": false,
-            "Description": "Only enable if using UltraCam Console as it'll slow down load-times.",
-            "Config_Class": [
-                "Console",
-                "AutoConnect"
-            ]
-        },
-        "animationfadeout": {
-            "Name": "Last Keyframe Fadeout",
-            "Class": "bool",
-            "Section": "extra",
-            "Auto": false,
-            "Default": false,
-            "Description": "Improves the smoothness of the last Keyframe for UltraCam sequencer.",
-            "Config_Class": [
-                "UltraCam",
-                "AnimationFadeout"
-            ]
-        },
-        "slowtime": {
-            "Name": "Slow Time",
-            "Class": "bool",
-            "Section": "extra",
-            "Auto": false,
-            "Default": false,
-            "Description": "UltraCam Calamity SlowTime.\n This is controlled by a time scale.",
-            "Config_Class": [
-                "Features",
-                "IsTimeSlower"
-            ]
-        }
+  "UltraCam": {
+    "gamecameratype": {
+      "Name": "Game Camera Type",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [
+        "Third Person",
+        "First Person", 
+        "Top Down"
+      ],
+      "Values": [
+        "Default",
+        "FirstPerson",
+        "TopDown"
+      ],
+      "Default": 0,
+      "Description": "Set the game camera type.",
+      "Config_Class": ["UltraCam", "GameCameraType"]
+    },
+    "triggerwithcontroller": {
+      "Name": "FreeCam Hotkey",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Allow triggering FreeCam with a controller.",
+      "Config_Class": ["UltraCam", "TriggerWithController"]
+    },
+    "cameraspeed": {
+      "Name": "Camera Speed",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [10.0, 150.0],
+      "Type": "f32",
+      "Default": 90.0,
+      "Increments": 5.0,
+      "Description": "Adjust the overall camera sensitivity/speed.",
+      "Config_Class": ["UltraCam", "CameraSpeed"]
+    },
+    "cameralag": {
+      "Name": "Camera Lag",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [0.0, 50.0],
+      "Type": "f32",
+      "Default": 20.0,
+      "Increments": 1.0,
+      "Description": "Adjust camera trailing lag.",
+      "Config_Class": ["UltraCam", "CameraLag"]
+    },
+    "autohideui": {
+      "Name": "Auto Hide UI",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Automatically hide UI in FreeCam.",
+      "Config_Class": ["UltraCam", "AutoHideUI"]
+    },
+    "mouse": {
+      "Name": "Enable Mouse",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Enable mouse controls for FreeCam.",
+      "Config_Class": ["UltraCam", "Mouse"]
+    },
+    "gamecameraspeed": {
+      "Name": "Camera Speed",
+      "Class": "dropdown",
+      "Section": "extra",
+      "Auto": false,
+      "Name_Values": ["Slow", "Default", "Fast", "Really Fast"],
+      "Values": ["{0.75, 0.75}", "{1.00, 1.00}", "{2.0, 1.5}, {3.0, 2.0}"],
+      "Default": 0,
+      "Description": "Multiplier for horizontal and vertical camera speeds.",
+      "Config_Class": ["Features", "GameCameraSpeed"]
+    },
+    "fov": {
+      "Name": "FOV",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [20.0, 120.0],
+      "Type": "f32",
+      "Default": 50.0,
+      "Increments": 5.0,
+      "Description": "Adjust field of view.",
+      "Config_Class": ["Features", "Fov"]
+    },
+    "fp_backflip": {
+      "Name": "FP Backflip",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Turning on backflips can cause nausea, recommended off in First Person.",
+      "Config_Class": ["FirstPerson", "Backflip"]
+    },
+    "fp_skiplock": {
+      "Name": "FP Skip Lock",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": false,
+      "Description": "Skip lock-on in First Person mode.",
+      "Config_Class": ["FirstPerson", "SkipLock"]
+    },
+    "fp_enablegyro": {
+      "Name": "FP Enable Gyro",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Enable Gyro controls in First Person mode.",
+      "Config_Class": ["FirstPerson", "EnableGyro"]
+    },
+    "fp_speed": {
+      "Name": "FP Speed",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [10.0, 100.0],
+      "Type": "f32",
+      "Default": 30.0,
+      "Increments": 5.0,
+      "Description": "Adjust camera speed in First Person.",
+      "Config_Class": ["FirstPerson", "Speed"]
+    },
+    "fp_bowspeed": {
+      "Name": "FP Bow Speed",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [10.0, 100.0],
+      "Type": "f32",
+      "Default": 30.0,
+      "Increments": 5.0,
+      "Description": "Adjust aiming speed with bow in First Person.",
+      "Config_Class": ["FirstPerson", "BowSpeed"]
+    },
+    "fp_fov": {
+      "Name": "FP FOV",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [60.0, 130.0],
+      "Type": "f32",
+      "Default": 90.0,
+      "Increments": 5.0,
+      "Description": "Adjust First Person field of view.",
+      "Config_Class": ["FirstPerson", "Fov"]
+    },
+    "ucpause": {
+      "Name": "UltraCam Legacy Pause",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Simulated game speed pause, allowing menu to work.",
+      "Config_Class": ["PauseSystem", "UCPause"]
     }
+  },
+  "Cheats": {
+    "godmode": {
+      "Name": "Godmode",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Invincibility.",
+      "Config_Class": ["Cheats", "Godmode"]
+    },
+    "nofall": {
+      "Name": "No Fall Damage",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Take zero fall damage.",
+      "Config_Class": ["Cheats", "NoFall"]
+    },
+    "zerogravityglider": {
+      "Name": "Zero Gravity Glider",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Do not lose altitude while gliding.",
+      "Config_Class": ["Cheats", "ZeroGravityGlider"]
+    },
+    "infinitedurability": {
+      "Name": "Infinite Durability",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Weapons never break.",
+      "Config_Class": ["Cheats", "InfiniteDurability"]
+    },
+    "regenhp": {
+      "Name": "Regen HP Every Second",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Regenerate health passively.",
+      "Config_Class": ["Cheats", "RegenHpEverySecond"]
+    },
+    "nogloom": {
+      "Name": "No Gloom Damage",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Immunity to gloom.",
+      "Config_Class": ["Cheats", "NoGloom"]
+    },
+    "infinitestamina": {
+      "Name": "Infinite Stamina",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Never run out of stamina.",
+      "Config_Class": ["Cheats", "InfiniteStamina"]
+    },
+    "autokill": {
+      "Name": "Auto Kill",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Instantly kill nearby enemies.",
+      "Config_Class": ["Cheats", "AutoKill"]
+    },
+    "durabilitymulti": {
+      "Name": "Durability Multiplier",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [1, 100],
+      "Type": "s32",
+      "Default": 1,
+      "Increments": 1,
+      "Description": "Multiply weapon durability.",
+      "Config_Class": ["Cheats", "DurabilityMultiplier"]
+    },
+    "staminadrain": {
+      "Name": "Stamina Drain Multiplier",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.0, 5.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust the rate at which stamina depletes.",
+      "Config_Class": ["Cheats", "StaminaDrain"]
+    },
+    "climbspeed": {
+      "Name": "Climb Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust climbing speed.",
+      "Config_Class": ["Cheats", "ClimbSpeed"]
+    },
+    "walkspeed": {
+      "Name": "Walk Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust walking speed.",
+      "Config_Class": ["Cheats", "WalkSpeed"]
+    },
+    "runspeed": {
+      "Name": "Run Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust running speed.",
+      "Config_Class": ["Cheats", "RunSpeed"]
+    },
+    "swimspeed": {
+      "Name": "Swim Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust swimming speed.",
+      "Config_Class": ["Cheats", "SwimSpeed"]
+    },
+    "glidespeed": {
+      "Name": "Glide Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust gliding speed.",
+      "Config_Class": ["Cheats", "GlideSpeed"]
+    },
+    "gravity": {
+      "Name": "Gravity",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.1, 5.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.1,
+      "Description": "Adjust world gravity multiplier.",
+      "Config_Class": ["Cheats", "Gravity"]
+    },
+    "windspeed": {
+      "Name": "Wind Speed",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.0, 5.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust wind speed multiplier.",
+      "Config_Class": ["Cheats", "WindSpeed"]
+    },
+    "damagedealt": {
+      "Name": "Damage Dealt",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 100.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 1.0,
+      "Description": "Multiplier for damage dealt to enemies.",
+      "Config_Class": ["Cheats", "DamageDealt"]
+    },
+    "damagetaken": {
+      "Name": "Damage Taken",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.0, 10.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Multiplier for damage received.",
+      "Config_Class": ["Cheats", "DamageTaken"]
+    },
+    "moonjump": {
+      "Name": "Moon Jump",
+      "Class": "bool",
+      "Section": "cheat",
+      "Auto": true,
+      "Default": false,
+      "Description": "Enable mid-air jumping.",
+      "Config_Class": ["Cheats", "MoonJump"]
+    },
+    "moonjumpintensity": {
+      "Name": "Moon Jump Intensity",
+      "Class": "scale",
+      "Section": "cheat",
+      "Auto": true,
+      "Values": [0.5, 5.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust height of moon jumps.",
+      "Config_Class": ["Cheats", "MoonJumpIntensity"]
+    }
+  },
+  "Console": {
+    "ip": {
+      "Name": "Console IP",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": ["127.0.0.1", "192.168.1.1"],
+      "Values": ["127.0.0.1", "192.168.1.1"],
+      "Default": 0,
+      "Description": "Console IP for connection.",
+      "Config_Class": ["Console", "IP"]
+    },
+    "port": {
+      "Name": "Port",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [1000, 9999],
+      "Type": "s32",
+      "Default": 5555,
+      "Increments": 1,
+      "Description": "Console Port.",
+      "Config_Class": ["Console", "Port"]
+    },
+    "autoconnect": {
+      "Name": "Auto Connect",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": false,
+      "Description": "Automatically connect to console.",
+      "Config_Class": ["Console", "AutoConnect"]
+    }
+  },
+  "Gameplay": {
+    "overrideidleanim": {
+      "Name": "Override Idle Animation",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": false,
+      "Description": "Override the player's idle animation.",
+      "Config_Class": ["Gameplay", "OverrideIdleAnim"]
+    },
+    "overrideidleanimname": {
+      "Name": "Idle Anim Name",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": ["Wait"],
+      "Values": ["Wait"],
+      "Default": 0,
+      "Description": "Set the overridden idle animation name.",
+      "Config_Class": ["Gameplay", "OverrideIdleAnimName"]
+    },
+    "overrideidlefaceanim": {
+      "Name": "Override Idle Face Anim",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": false,
+      "Description": "Override the player's idle face animation.",
+      "Config_Class": ["Gameplay", "OverrideIdleFaceAnim"]
+    },
+    "overrideidlefaceanimname": {
+      "Name": "Idle Face Anim Name",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": true,
+      "Name_Values": ["FaceDefault"],
+      "Values": ["FaceDefault"],
+      "Default": 0,
+      "Description": "Set the overridden idle face animation name.",
+      "Config_Class": ["Gameplay", "OverrideIdleFaceAnimName"]
+    },
+    "autoattach": {
+      "Name": "Hacks, Auto Attach",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "Automatically re-attach fused items to arrows.",
+      "Config_Class": ["Gameplay", "AutoAttach"]
+    },
+    "mapspeed": {
+      "Name": "Map Speed",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [0.5, 5.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust map cursor speed.",
+      "Config_Class": ["Gameplay", "MapSpeed"]
+    },
+    "timespeed": {
+      "Name": "Game Time Speed",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [0.1, 120.0],
+      "Type": "f32",
+      "Default": 1.0,
+      "Increments": 0.5,
+      "Description": "Adjust the flow of in-game time.",
+      "Config_Class": ["Features", "TimeSpeed"]
+    },
+    "istimeslower": {
+      "Name": "Slow Game Time",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Slows down the time based on the Time Speed Value.",
+      "Config_Class": ["Features", "IsTimeSlower"]
+    },
+    "istimepaused": {
+      "Name": "Is Time Paused",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Pauses the game time completely.",
+      "Config_Class": ["Features", "IsTimePaused"]
+    }
+  },
+  "Main": {
+    "buffer": {
+      "Name": "FPS, Frame Smoothing",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [1, 12],
+      "Type": "s32",
+      "Default": 8,
+      "Increments": 1,
+      "Description": "FPS frame buffer limit.",
+      "Config_Class": ["FPS", "Buffer"]
+    },
+    "maxfps": {
+      "Name": "FPS",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [20.0, 240.0],
+      "Type": "f32",
+      "Default": 60.0,
+      "Increments": 5.0,
+      "Description": "Game Max FPS Limit.",
+      "Config_Class": ["FPS", "MaxFPS"]
+    },
+    "moviefps": {
+      "Name": "Movie FPS",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [30.0, 120.0],
+      "Type": "f32",
+      "Default": 30.0,
+      "Increments": 30.0,
+      "Description": "In-Game Movies Max FPS Limit.",
+      "Config_Class": ["FPS", "MovieFPS"]
+    },
+    "menufps": {
+      "Name": "Menu FPS",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": false,
+      "Values": [30.0, 120.0],
+      "Type": "f32",
+      "Default": 30.0,
+      "Increments": 30.0,
+      "Description": "Menu Max FPS Limit.",
+      "Config_Class": ["FPS", "MenuFPS"]
+    },
+    "dynamicfps": {
+      "Name": "FPS, Dynamic Mode",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Enable Dynamic Framerate adjusting game speed.",
+      "Config_Class": ["FPS", "DynamicFPS"]
+    },
+    "allowlegacypast120fps": {
+      "Name": "FPS, Allow Legacy 120+",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Allows Legacy Emulators to reach 120+ FPS.",
+      "Config_Class": ["FPS", "AllowLegacyPast120FPS"]
+    },
+    "alwaysforceframelock": {
+      "Name": "FPS, Use UC FPS Lock",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Forces UltraCam FPS Lock instead of the in-game FPS Lock, feel free to use it, if the game speeds up.",
+      "Config_Class": ["FPS", "AlwaysForceFrameLock"]
+    },
+    "capdeltatimetofps": {
+      "Name": "FPS, Cap DeltaTime",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Caps Delta Time to MaxFPS, this can cause the game to speed-up if frame locker is disabled, turn off to have the game always be dynamic.",
+      "Config_Class": ["FPS", "CapDeltaTimeToFPS"]
+    },
+    "fxaa": {
+      "Name": "Graphics, FXAA",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Enable FXAA.",
+      "Config_Class": ["Graphics", "FXAA"]
+    },
+    "fsr": {
+      "Name": "Graphics, FSR",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Enable FSR scaling.",
+      "Config_Class": ["Graphics", "FSR"]
+    },
+    "dynamicresolution": {
+      "Name": "Dynamic Resolution",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Toggle dynamic resolution scaling.",
+      "Config_Class": ["Graphics", "DynamicResolution"]
+    },
+    "changeanisotropy": {
+      "Name": "Change Anisotropy",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Override Anisotropy filtering.",
+      "Config_Class": ["Graphics", "ChangeAnisotropy"]
+    },
+    "anistrophylevel": {
+      "Name": "Anistrophy Level",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": false,
+      "Values": [1, 16],
+      "Type": "s32",
+      "Default": 16,
+      "Increments": 1,
+      "Description": "Anisotropy texture filtering level.",
+      "Config_Class": ["Graphics", "AnistrophyLevel"]
+    },
+    "renderdistance": {
+      "Name": "Render Distance",
+      "Class": "scale",
+      "Section": "main",
+      "Auto": true,
+      "Values": [1000, 50000],
+      "Type": "s32",
+      "Default": 25000,
+      "Increments": 1000,
+      "Description": "Draw distance for environments.",
+      "Config_Class": ["Graphics", "RenderDistance"]
+    },
+    "levelofdetailforced": {
+      "Name": "Level of Detail Forced",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Force a specific level of detail globally.",
+      "Config_Class": ["Graphics", "LevelOfDetailForced"]
+    },
+    "levelofdetail": {
+      "Name": "Level of Detail",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [1, 5],
+      "Type": "s32",
+      "Default": 1,
+      "Increments": 1,
+      "Description": "Set standard Level of Detail.",
+      "Config_Class": ["Graphics", "LevelOfDetail"]
+    },
+    "aspectratioV2": {
+      "Name": "Aspect Ratio",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [
+        "16:9", 
+        "16:10", 
+        "21:9",
+        "21.5:9",
+        "32:9",
+        "4:3", 
+        "1:1", 
+        "9:16"
+      ],
+      "Values": [
+        "{16.00, 9.00}", 
+        "{16.00, 10.00}", 
+        "{21.00, 9.00}", 
+        "{21.50, 9.00}", 
+        "{32.00, 9.00}", 
+        "{4.00, 3.00}", 
+        "{1.00, 1.00}", 
+        "{9.00, 16.00}"
+      ],
+      "Default": 0,
+      "Description": "Game Aspect Ratios, this uses UltraCam's Aspect Ratio Algorithm to set the Aspect Ratio in-game.",
+      "Config_Class": ["Resolution", "AspectRatio"]
+    },
+    "docked": {
+      "Name": "Docked Resolution",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [
+        "HD     1280x720", 
+        "HD+    1600x900", 
+        "FULLHD 1920x1080", 
+        "QHD    2560x1440", 
+        "4K     3840x2160",
+        "5K     5120x2880", 
+        "6K     6144x3456", 
+        "8K     7680x4320", 
+        "10K    10240x4320"
+      ],
+      "Values": [
+        "{1280.00, 720.00}", 
+        "{1600.00, 900.00}", 
+        "{1920.00, 1080.00}", 
+        "{2560.00, 1440.00}", 
+        "{3840.00, 2160.00}",
+        "{5120.00, 2880.00}", 
+        "{6144.00, 3456.00}", 
+        "{7680.00, 4320.00}", 
+        "{10240.00, 4320.00}"
+      ],
+      "Default": 2,
+      "Description": "Uses UltraCam's Internal Resolution to force higher resolutions, Emulator scale should be set to 1X and DRAM should be set to either 6GB or 8GB.",
+      "Config_Class": ["Resolution", "Docked"]
+    },
+    "handheld": {
+      "Name": "Handheld Resolution",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": [
+        "HD     1280x720", 
+        "HD+    1600x900", 
+        "FULLHD 1920x1080", 
+        "QHD    2560x1440", 
+        "4K     3840x2160",
+        "5K     5120x2880", 
+        "6K     6144x3456", 
+        "8K     7680x4320", 
+        "10K    10240x4320"
+      ],
+      "Values": [
+        "{1280.00, 720.00}", 
+        "{1600.00, 900.00}", 
+        "{1920.00, 1080.00}", 
+        "{2560.00, 1440.00}", 
+        "{3840.00, 2160.00}",
+        "{5120.00, 2880.00}", 
+        "{6144.00, 3456.00}", 
+        "{7680.00, 4320.00}", 
+        "{10240.00, 4320.00}"
+      ],
+      "Default": 0,
+      "Description": "Uses UltraCam's Internal Resolution to force higher resolutions, Emulator scale should be set to 1X and DRAM should be set to either 6GB or 8GB.",
+      "Config_Class": ["Resolution", "Handheld"]
+    },
+    "forcedocked": {
+      "Name": "Force Docked",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "Forces the game to use Docked Resolution when in Handheld.",
+      "Config_Class": ["Resolution", "ForceDocked"]
+    },
+    "shadows": {
+      "Name": "Shadow Resolution",
+      "Class": "dropdown",
+      "Section": "main",
+      "Auto": false,
+      "Name_Values": ["x512", "x1024", "x2048", "x4096", "x8192"],
+      "Values": [512, 1024, 2048, 4096, 8192],
+      "Default": 1,
+      "Description": "Uses UltraCam's Internal Shadow Resolution.",
+      "Config_Class": ["Resolution", "Shadows"]
+    }
+  },
+  "Randomizer": {
+    "isenabled": {
+      "Name": "Is Enabled",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Enable Randomizer features. May cause crashes.",
+      "Config_Class": ["Randomizer", "IsEnabled"]
+    },
+    "items": {
+      "Name": "Randomize Items",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Randomize dropped and overworld items.",
+      "Config_Class": ["Randomizer", "Items"]
+    },
+    "weapons": {
+      "Name": "Randomize Weapons",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Randomize weapons.",
+      "Config_Class": ["Randomizer", "Weapons"]
+    },
+    "enemies": {
+      "Name": "Randomize Enemies",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Randomize enemy spawns.",
+      "Config_Class": ["Randomizer", "Enemies"]
+    },
+    "bosses": {
+      "Name": "Randomize Bosses",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Randomize boss encounters.",
+      "Config_Class": ["Randomizer", "Bosses"]
+    },
+    "scale": {
+      "Name": "Randomize Scale",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Randomize the physical scale of entities.",
+      "Config_Class": ["Randomizer", "Scale"]
+    }
+  },
+  "Shaders": {
+    "ambientocclusion": {
+      "Name": "Ambient Occlusion",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Ambient Occlusion.",
+      "Config_Class": ["Shaders", "AmbientOcclusion"]
+    },
+    "volumetricfog": {
+      "Name": "Volumetric Fog",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Volumetric Fog.",
+      "Config_Class": ["Shaders", "VolumetricFog"]
+    },
+    "grass1": {
+      "Name": "Grass 1",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Grass Shader Layer 1.",
+      "Config_Class": ["Shaders", "Grass1"]
+    },
+    "grass2": {
+      "Name": "Grass 2",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Grass Shader Layer 2.",
+      "Config_Class": ["Shaders", "Grass2"]
+    },
+    "grass3": {
+      "Name": "Grass 3",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Grass Shader Layer 3.",
+      "Config_Class": ["Shaders", "Grass3"]
+    },
+    "characterlight": {
+      "Name": "Character Light",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle standard Character Light.",
+      "Config_Class": ["Shaders", "CharacterLight"]
+    },
+    "tonemapper": {
+      "Name": "Tone Mapper",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Tone Mapping.",
+      "Config_Class": ["Shaders", "ToneMapper"]
+    },
+    "miasma": {
+      "Name": "Shader, Miasma",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Miasma / Gloom Shader.",
+      "Config_Class": ["Shaders", "Miasma"]
+    },
+    "lightfrag": {
+      "Name": "Shader, Light Frag",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Fragment Lighting.",
+      "Config_Class": ["Shaders", "LightFrag"]
+    },
+    "bloom": {
+      "Name": "Shader, Bloom 1",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Bloom Layer 1.",
+      "Config_Class": ["Shaders", "Bloom"]
+    },
+    "bloom2": {
+      "Name": "Shader, Bloom 2",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Bloom Layer 2.",
+      "Config_Class": ["Shaders", "Bloom2"]
+    },
+    "bloom3": {
+      "Name": "Shader, Bloom 3",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Bloom Layer 3.",
+      "Config_Class": ["Shaders", "Bloom3"]
+    },
+    "lensflare": {
+      "Name": "Shader, Lensflare",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Toggle Lensflare.",
+      "Config_Class": ["Shaders", "Lensflare"]
+    },
+    "lightshader": {
+      "Name": "Shader, Light Shader",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle primary light shader.",
+      "Config_Class": ["Shaders", "LightShader"]
+    },
+    "cellshading": {
+      "Name": "Shader, Cell Shading",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Cell Shading aesthetics.",
+      "Config_Class": ["Shaders", "CellShading"]
+    },
+    "fogeffects": {
+      "Name": "Shader, Fog Effects",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle generic Fog effects.",
+      "Config_Class": ["Shaders", "FogEffects"]
+    },
+    "watershader": {
+      "Name": "Shader, Water Shader",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Water Rendering Shaders.",
+      "Config_Class": ["Shaders", "WaterShader"]
+    },
+    "torch": {
+      "Name": "Shader, Torch",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Torch flame shaders.",
+      "Config_Class": ["Shaders", "Torch"]
+    },
+    "swordsheat": {
+      "Name": "Shader, Sword Sheat",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Sword Sheath shading.",
+      "Config_Class": ["Shaders", "SwordSheat"]
+    },
+    "depthoffield": {
+      "Name": "Shader, Depth Of Field",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Toggle Depth of Field.",
+      "Config_Class": ["Shaders", "DepthOfField"]
+    },
+    "bowdepthoffield1": {
+      "Name": "Shader, Bow DOF 1",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Toggle Bow Aiming Depth of Field.",
+      "Config_Class": ["Shaders", "BowDepthOfField1"]
+    },
+    "bowdepthoffield2": {
+      "Name": "Shader, Bow DOF 2",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": true,
+      "Description": "Toggle Bow Aiming Depth of Field.",
+      "Config_Class": ["Shaders", "BowDepthOfField2"]
+    },
+    "screenspacerefl": {
+      "Name": "Screen Space Reflections",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Screen Space Reflections.",
+      "Config_Class": ["Shaders", "ScreenSpaceRefl"]
+    },
+    "globalillumination": {
+      "Name": "Global Illumination",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle Global Illumination.",
+      "Config_Class": ["Shaders", "GlobalIllumination"]
+    },
+    "skyislandshader": {
+      "Name": "Sky Island Shader",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle specific Sky Island shaders.",
+      "Config_Class": ["Shaders", "SkyIslandShader"]
+    },
+    "farlightsshader": {
+      "Name": "Far Lights Shader",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": true,
+      "Default": true,
+      "Description": "Toggle rendering for distant lights.",
+      "Config_Class": ["Shaders", "FarLightsShader"]
+    },
+    "custom_characterlight": {
+      "Name": "Custom Character Light",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Toggle Custom Character Light Shader.",
+      "Config_Class": ["CustomShaders", "CharacterLight"]
+    }
+  },
+  "UI": {
+    "displaylows": {
+      "Name": "Menu, Display Lows",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display 1% low FPS.",
+      "Config_Class": ["FPS", "DisplayLows"]
+    },
+    "displaymax": {
+      "Name": "Menu, Display Max",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display Max FPS.",
+      "Config_Class": ["FPS", "DisplayMax"]
+    },
+    "displayaverage": {
+      "Name": "Menu, Display Average",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display Average FPS.",
+      "Config_Class": ["FPS", "DisplayAverage"]
+    },
+    "displayms": {
+      "Name": "Menu, Display Frame MS",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display Frametime in ms.",
+      "Config_Class": ["FPS", "DisplayMs"]
+    },
+    "displaygraph": {
+      "Name": "Menu, Display Graph",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display FPS Graph.",
+      "Config_Class": ["FPS", "DisplayGraph"]
+    },
+    "displayinfo": {
+      "Name": "Menu, Display Info",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Display System Info.",
+      "Config_Class": ["FPS", "DisplayInfo"]
+    },
+    "overlay": {
+      "Name": "Menu, FPS Overlay",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Enable UltraCam FPS Overlay.",
+      "Config_Class": ["Menu", "Overlay"]
+    },
+    "tooltips": {
+      "Name": "Menu, Tool Tips",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Enable Tooltips in menus.",
+      "Config_Class": ["Menu", "ToolTips"]
+    },
+    "cameraanimation": {
+      "Name": "Menu, Camera Animation",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": true,
+      "Description": "Enable UltraCam Menu Camera Animation.",
+      "Config_Class": ["Menu", "CameraAnimation"]
+    },
+    "dpscounter": {
+      "Name": "Game, DPS Counter",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": false,
+      "Default": false,
+      "Description": "Show Damage Per Second overlay.",
+      "Config_Class": ["UltraCam", "DPSCounter"]
+    },
+    "dpscounteraverage": {
+      "Name": "Game, DPS Counter Average",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Show DPS Average.",
+      "Config_Class": ["UltraCam", "DPSCounterAverage"]
+    },
+    "dpscounterhits": {
+      "Name": "Game, DPS Counter Hits",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Show Hits in DPS Counter.",
+      "Config_Class": ["UltraCam", "DPSCounterHits"]
+    },
+    "dpscountery": {
+      "Name": "Game, DPS Counter Y",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [0.0, 1000.0],
+      "Type": "f32",
+      "Default": 250.0,
+      "Increments": 10.0,
+      "Description": "Vertical position of the DPS counter.",
+      "Config_Class": ["UltraCam", "DPSCounterY"]
+    },
+    "dpscounterms": {
+      "Name": "Game, DPS Counter MS",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [1000, 10000],
+      "Type": "s32",
+      "Default": 3000,
+      "Increments": 500,
+      "Description": "Timeout for the DPS Counter.",
+      "Config_Class": ["UltraCam", "DPSCounterMS"]
+    },
+    "distancescan": {
+      "Name": "Watcher Distance",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [10.0, 200.0],
+      "Type": "f32",
+      "Default": 50.0,
+      "Increments": 5.0,
+      "Description": "Distance threshold to scan for Actor entities.",
+      "Config_Class": ["Watcher", "DistanceScan"]
+    },
+    "textsize": {
+      "Name": "Watcher, Text Size",
+      "Class": "scale",
+      "Section": "extra",
+      "Auto": true,
+      "Values": [1.0, 10.0],
+      "Type": "f32",
+      "Default": 3.5,
+      "Increments": 0.5,
+      "Description": "Size of the text in the Watcher Overlay.",
+      "Config_Class": ["Watcher", "TextSize"]
+    },
+    "actorinfo": {
+      "Name": "Watcher, Actor Info",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Display Actor Information.",
+      "Config_Class": ["Watcher", "ActorInfo"]
+    },
+    "boundingbox": {
+      "Name": "Watcher, Bounding Box",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Draw Bounding Boxes around entities.",
+      "Config_Class": ["Watcher", "BoundingBox"]
+    },
+    "actorcontrols": {
+      "Name": "Watcher, Actor Controls",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Enable Watcher Actor Controls.",
+      "Config_Class": ["Watcher", "ActorControls"]
+    },
+    "watchplayer": {
+      "Name": "Watcher, Watch Player",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Include Player in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchPlayer"]
+    },
+    "watchenemy": {
+      "Name": "Watcher, Watch Enemy",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Include Enemies in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchEnemy"]
+    },
+    "watchanimals": {
+      "Name": "Watcher, Watch Animals",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": true,
+      "Description": "Include Animals in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchAnimals"]
+    },
+    "watchnpcs": {
+      "Name": "Watcher, Watch NPCs",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Include NPCs in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchNPCs"]
+    },
+    "watchweapons": {
+      "Name": "Watcher, Watch Weapons",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Include Weapons in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchWeapons"]
+    },
+    "watchitems": {
+      "Name": "Watcher, Watch Items",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Include Items in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchItems"]
+    },
+    "watchunknown": {
+      "Name": "Watcher, Watch Unknown",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Include Unknown objects in Watcher scan.",
+      "Config_Class": ["Watcher", "WatchUnknown"]
+    },
+    "enemyhealthhp": {
+      "Name": "Game, Enemy HP UI",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "Show Enemy Health value in UI.",
+      "Config_Class": ["Gameplay", "EnemyHealthHp"]
+    },
+    "weaponhealthhp": {
+      "Name": "Game, Weapon HP UI",
+      "Class": "bool",
+      "Section": "main",
+      "Auto": false,
+      "Default": false,
+      "Description": "Show Weapon Health value in UI.",
+      "Config_Class": ["Gameplay", "WeaponHealthHp"]
+    },
+    "separatesmallbars": {
+      "Name": "Separate Small Stamina Bars",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Visual tweak for the Stamina UI.",
+      "Config_Class": ["StaminaBar", "SeparateSmallBars"]
+    },
+    "alwaysdisplay": {
+      "Name": "Game, Stamina Bar UI",
+      "Class": "bool",
+      "Section": "extra",
+      "Auto": true,
+      "Default": false,
+      "Description": "Use UltraCam Custom Stamina Bar.",
+      "Config_Class": ["StaminaBar", "AlwaysDisplay"]
+    }
+  }
 }

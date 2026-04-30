@@ -86,7 +86,7 @@ class Manager:
         Manager._Cheats = Cheats  # Store class because circular bs
 
         # Load Patch Info for current game.
-        Manager.ultracam_beyond = Manager._patchInfo.LoadJson()
+        Manager.UltracamPatchJson = Manager._patchInfo.LoadJson()
 
         # Load Localization
         Manager.description = Localization.GetJson()
@@ -95,6 +95,7 @@ class Manager:
 
         # ULTRACAM 2.0 PATCHES ARE SAVED HERE.
         Manager.UserChoices = {}
+        Manager.UserConfigs = {}
         Manager.setting = Setting(Manager)
 
         # Local text variable
@@ -150,7 +151,7 @@ class Manager:
 
                 Manager._patchInfo = item
                 Cheats.Initialize(Manager, item)
-                Manager.ultracam_beyond = Manager._patchInfo.LoadJson()
+                Manager.UltracamPatchJson = Manager._patchInfo.LoadJson()
                 pos_dict = copy.deepcopy(Manager.Back_Pos)
 
                 # DeletePatches and Load New Patches.
@@ -178,7 +179,6 @@ class Manager:
         )
 
     def UpdateEmuScale(Manager, canvas: ttk.Canvas, variable: ttk.Variable, name: str):
-        keys = Manager.ultracam_beyond.get("Keys", [""])
         try:
             if (Manager.UserChoices["resolution"] is not None):
                 Resolution = Manager.UserChoices["resolution"].get()
@@ -189,127 +189,134 @@ class Manager:
 
     def LoadPatches(Manager, canvas, pos_dict):
         ResolutionScaleName = "Resolution Scale"
+        for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
+            keys = value
+            for name in keys:
+                dicts = keys[name]
 
-        keys = Manager.ultracam_beyond.get("Keys", [""])
-        for name in keys:
-            dicts = keys[name]
+                patch_var = None
+                patch_list = dicts.get("Name_Values", [""])
+                patch_values = dicts.get("Values")
+                patch_name = dicts.get("Name")
+                patch_auto = dicts.get("Auto")
+                section_auto = dicts.get("Section")
+                patch_description = dicts.get("Description")
+                patch_default_index = dicts.get("Default")
+                
+                try : 
+                    pos = pos_dict[section_auto]
+                except Exception as e :
+                    log.warning(f"Section Not Implemented Yet {section_auto}")
+                    continue
 
-            patch_var = None
-            patch_list = dicts.get("Name_Values", [""])
-            patch_values = dicts.get("Values")
-            patch_name = dicts.get("Name")
-            patch_auto = dicts.get("Auto")
-            section_auto = dicts.get("Section")
-            patch_description = dicts.get("Description")
-            patch_default_index = dicts.get("Default")
-            pos = pos_dict[section_auto]
-            if patch_auto is True:
-                Manager.UserChoices[name] = ttk.StringVar(
-                    master=Manager._window, value="auto"
-                )
-                continue
+                if patch_auto is True:
+                    Manager.UserChoices[name] = ttk.StringVar(
+                        master=Manager._window, value="auto"
+                    )
+                    continue
 
-            if dicts["Class"].lower() == "dropdown":
-                patch_var = Canvas_Create.create_combobox(
+                if dicts["Class"].lower() == "dropdown":
+                    patch_var = Canvas_Create.create_combobox(
+                        master=Manager._window,
+                        canvas=canvas,
+                        text=patch_name,
+                        values=patch_list,
+                        variable=patch_list[patch_default_index],
+                        row=pos[0],
+                        cul=pos[1],
+                        drop_cul=pos[2],
+                        width=100,
+                        tags=["dropdown", "patchinfo"],
+                        tag=section_auto,
+                        text_description=patch_description,
+                        command=(lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)) if name == "resolution" else None
+                    )
+                    new_pos = increase_row(pos[0], pos[1], pos[2])
+                    pos[0] = new_pos[0]
+                    pos[1] = new_pos[1]
+                    pos[2] = new_pos[2]
+
+                if dicts["Class"].lower() == "scale":
+
+                    patch_type = dicts.get("Type")
+                    patch_increments = dicts.get("Increments")
+                    patch_var = Canvas_Create.create_scale(
+                        master=Manager._window,
+                        canvas=canvas,
+                        text=patch_name,
+                        scale_from=patch_values[0],
+                        scale_to=patch_values[1],
+                        type=patch_type,
+                        row=pos[0],
+                        cul=pos[1],
+                        drop_cul=pos[2],
+                        width=100,
+                        increments=float(patch_increments),
+                        tags=["scale", "patchinfo"],
+                        tag=section_auto,
+                        text_description=patch_description,
+                    )
+                    if patch_type == "f32":
+                        print(f"{patch_name} - {patch_default_index}")
+                        patch_var.set(float(patch_default_index))
+                    else:
+                        patch_var.set(patch_default_index)
+
+                    canvas.itemconfig(patch_name, text=f"{float(patch_default_index)}")
+                    new_pos = increase_row(pos[0], pos[1], pos[2])
+                    pos[0] = new_pos[0]
+                    pos[1] = new_pos[1]
+                    pos[2] = new_pos[2]
+
+                if dicts["Class"].lower() == "bool":
+                    patch_var = Canvas_Create.create_checkbutton(
+                        master=Manager._window,
+                        canvas=canvas,
+                        text=patch_name,
+                        variable="Off",
+                        row=pos[3],
+                        cul=pos[4],
+                        drop_cul=pos[5],
+                        tags=["bool", "patchinfo"],
+                        tag=section_auto,
+                        text_description=patch_description,
+                    )
+                    if patch_default_index:
+                        patch_var.set("On")
+                    new_pos = increase_row(pos[3], pos[4], pos[5])
+                    pos[3] = new_pos[0]
+                    pos[4] = new_pos[1]
+                    pos[5] = new_pos[2]
+
+                if patch_var is None:
+                    continue
+                Manager.UserChoices[name] = patch_var
+
+            pos = pos_dict["main"]
+
+            if (Manager._patchInfo.ResolutionScale is True):
+                Manager._EmulatorScale = Canvas_Create.create_scale(
                     master=Manager._window,
                     canvas=canvas,
-                    text=patch_name,
-                    values=patch_list,
-                    variable=patch_list[patch_default_index],
+                    text=ResolutionScaleName,
+                    scale_from=int(1),
+                    scale_to=int(4),
+                    type="s32",
                     row=pos[0],
                     cul=pos[1],
                     drop_cul=pos[2],
                     width=100,
-                    tags=["dropdown", "patchinfo"],
-                    tag=section_auto,
-                    text_description=patch_description,
-                    command=(lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)) if name == "resolution" else None
-                )
-                new_pos = increase_row(pos[0], pos[1], pos[2])
-                pos[0] = new_pos[0]
-                pos[1] = new_pos[1]
-                pos[2] = new_pos[2]
-
-            if dicts["Class"].lower() == "scale":
-
-                patch_type = dicts.get("Type")
-                patch_increments = dicts.get("Increments")
-                patch_var = Canvas_Create.create_scale(
-                    master=Manager._window,
-                    canvas=canvas,
-                    text=patch_name,
-                    scale_from=patch_values[0],
-                    scale_to=patch_values[1],
-                    type=patch_type,
-                    row=pos[0],
-                    cul=pos[1],
-                    drop_cul=pos[2],
-                    width=100,
-                    increments=float(patch_increments),
+                    increments=int(1),
                     tags=["scale", "patchinfo"],
-                    tag=section_auto,
-                    text_description=patch_description,
+                    tag="main",
+                    text_description="ResScale",
+                    command=lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)
                 )
-                if patch_type == "f32":
-                    print(f"{patch_name} - {patch_default_index}")
-                    patch_var.set(float(patch_default_index))
-                else:
-                    patch_var.set(patch_default_index)
-
-                canvas.itemconfig(patch_name, text=f"{float(patch_default_index)}")
-                new_pos = increase_row(pos[0], pos[1], pos[2])
-                pos[0] = new_pos[0]
-                pos[1] = new_pos[1]
-                pos[2] = new_pos[2]
-
-            if dicts["Class"].lower() == "bool":
-                patch_var = Canvas_Create.create_checkbutton(
-                    master=Manager._window,
-                    canvas=canvas,
-                    text=patch_name,
-                    variable="Off",
-                    row=pos[3],
-                    cul=pos[4],
-                    drop_cul=pos[5],
-                    tags=["bool", "patchinfo"],
-                    tag=section_auto,
-                    text_description=patch_description,
-                )
-                if patch_default_index:
-                    patch_var.set("On")
-                new_pos = increase_row(pos[3], pos[4], pos[5])
-                pos[3] = new_pos[0]
-                pos[4] = new_pos[1]
-                pos[5] = new_pos[2]
-
-            if patch_var is None:
-                continue
-            Manager.UserChoices[name] = patch_var
-
-        pos = pos_dict["main"]
-
-        if (Manager._patchInfo.ResolutionScale is True):
-            Manager._EmulatorScale = Canvas_Create.create_scale(
-                master=Manager._window,
-                canvas=canvas,
-                text=ResolutionScaleName,
-                scale_from=int(1),
-                scale_to=int(4),
-                type="s32",
-                row=pos[0],
-                cul=pos[1],
-                drop_cul=pos[2],
-                width=100,
-                increments=int(1),
-                tags=["scale", "patchinfo"],
-                tag="main",
-                text_description="ResScale",
-                command=lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)
-            )
-            Manager._EmulatorScale.set(1)
+                Manager._EmulatorScale.set(1)
         
     def DeletePatches(Manager):
         Manager.UserChoices.clear()
+        Manager.UserConfigs.clear()
         Manager.all_canvas[0].delete("patchinfo")
 
     def CreatePresets(Manager, row=40, cul_tex=60, cul_sel=220):

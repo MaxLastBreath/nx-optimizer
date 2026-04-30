@@ -17,133 +17,147 @@ def apply_preset(Manager, preset_options: dict):
     # Manager.fetch_var(Manager.fp_var, preset_options, "First Person")
     # Manager.fetch_var(Manager.selected_settings, preset_options, "Settings") # set Legacy settings.
 
-    patch_info = Manager.ultracam_beyond.get("Keys", [""])
+    for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):        
+        patch_info = value
 
-    if "emuscale" in preset_options:
-        Manager._EmulatorScale.set(preset_options["emuscale"])
+        if "emuscale" in preset_options:
+            Manager._EmulatorScale.set(preset_options["emuscale"])
 
-    for option_key, option_value in preset_options.items():
-        if option_key in Manager.selected_options:
-            Manager.selected_options[option_key].set(option_value)
-        else:
-            continue
-
-    selected_preset = Manager.selected_preset.get()
-
-    if selected_preset.lower() == "default":
-        for option_key in Manager.UserChoices:
-            try:
-                patch_dict = patch_info[option_key.lower()]
-            except KeyError:
+        for option_key, option_value in preset_options.items():
+            if option_key in Manager.selected_options:
+                Manager.selected_options[option_key].set(option_value)
+            else:
                 continue
-            patch_class = patch_dict["Class"]
-            patch_default = patch_dict["Default"]
 
-            if patch_class == "dropdown":
-                patch_names = patch_dict["Name_Values"]
-                Manager.UserChoices[option_key.lower()].set(patch_names[patch_default])
-            elif patch_class == "scale":
-                Manager.maincanvas.itemconfig(patch_dict["Name"], text=patch_default)
-                Manager.UserChoices[option_key.lower()].set(patch_default)
+        selected_preset = Manager.selected_preset.get()
+
+        if selected_preset.lower() == "default":
+            for option_key in Manager.UserChoices:
+                try:
+                    patch_dict = patch_info[option_key.lower()]
+                except KeyError:
+                    continue
+                patch_class = patch_dict["Class"]
+                patch_default = patch_dict["Default"]
+
+                if patch_class == "dropdown":
+                    patch_names = patch_dict["Name_Values"]
+                    Manager.UserChoices[option_key.lower()].set(patch_names[patch_default])
+                elif patch_class == "scale":
+                    Manager.maincanvas.itemconfig(patch_dict["Name"], text=patch_default)
+                    Manager.UserChoices[option_key.lower()].set(patch_default)
+                else:
+                    if patch_class == "bool":
+                        if patch_default is True: patch_default = "On"
+                        if patch_default is False: patch_default = "Off"
+                    Manager.UserChoices[option_key.lower()].set(patch_default)
+
+        for option_key, option_value in preset_options.items():
+            if option_key.lower() in Manager.UserChoices:
+                patch_dict = patch_info[option_key.lower()]
+                patch_class = patch_dict["Class"]
+                patch_default = patch_dict["Default"]
+
+                if patch_class == "dropdown":
+                    patch_Names = patch_dict["Name_Values"]
+                    Manager.UserChoices[option_key.lower()].set(patch_Names[int(option_value)])
+                elif patch_class == "scale":
+                    Manager.maincanvas.itemconfig(patch_dict["Name"], text=option_value)
+                    Manager.UserChoices[option_key.lower()].set(option_value)
+                else:
+                    if patch_class == "bool":
+                        if option_value is True: option_value = "On"
+                        if option_value is False: option_value = "Off"
+                    Manager.UserChoices[option_key.lower()].set(option_value)
             else:
-                if patch_class == "bool":
-                    if patch_default is True: patch_default = "On"
-                    if patch_default is False: patch_default = "Off"
-                Manager.UserChoices[option_key.lower()].set(patch_default)
-
-    for option_key, option_value in preset_options.items():
-        if option_key.lower() in Manager.UserChoices:
-            patch_dict = patch_info[option_key.lower()]
-            patch_class = patch_dict["Class"]
-            patch_default = patch_dict["Default"]
-
-            if patch_class == "dropdown":
-                patch_Names = patch_dict["Name_Values"]
-                Manager.UserChoices[option_key.lower()].set(patch_Names[int(option_value)])
-            elif patch_class == "scale":
-                Manager.maincanvas.itemconfig(patch_dict["Name"], text=option_value)
-                Manager.UserChoices[option_key.lower()].set(option_value)
-            else:
-                if patch_class == "bool":
-                    if option_value is True: option_value = "On"
-                    if option_value is False: option_value = "Off"
-                Manager.UserChoices[option_key.lower()].set(option_value)
-        else:
-            continue
+                continue
 
 def setGameConfig(Manager, config):
     # UltraCam Beyond new patches.
-    patch_info = Manager.ultracam_beyond.get("Keys", [""])
-    sectionName = Manager._patchInfo.ID
+    for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
+        patch_info = value
+        sectionName = Manager._patchInfo.ID
 
-    if not config.has_section(sectionName):
-        config.add_section(sectionName)
+        if not config.has_section(sectionName):
+            config.add_section(sectionName)
 
-    for patch in Manager.UserChoices:
-        patch_dict = patch_info[patch]
-        patch_class = patch_dict["Class"]
+        for patch in Manager.UserChoices:
+            try:
+                patch_dict = patch_info[patch]
+            except Exception as e:
+                continue
 
-        if Manager.UserChoices[patch] == "auto":
-            config.set(sectionName, patch, str(patch_dict["Default"]))
-            continue
-        elif Manager.UserChoices[patch].get() == "auto":
-            config.set(sectionName, patch, str(patch_dict["Default"]))
-            continue
+            patch_class = patch_dict["Class"]
 
-        if patch_class.lower() == "dropdown":
-            patch_Names = patch_dict["Name_Values"]
-            index = patch_Names.index(Manager.UserChoices[patch].get())
-            config.set(sectionName, patch, str(index))
-            continue
+            if Manager.UserChoices[patch] == "auto":
+                config.set(sectionName, patch, str(patch_dict["Default"]))
+                continue
+            elif Manager.UserChoices[patch].get() == "auto":
+                config.set(sectionName, patch, str(patch_dict["Default"]))
+                continue
 
-        config.set(sectionName, patch, Manager.UserChoices[patch].get())
+            if patch_class.lower() == "dropdown":
+                patch_Names = patch_dict["Name_Values"]
+                index = patch_Names.index(Manager.UserChoices[patch].get())
+                config.set(sectionName, patch, str(index))
+                continue
+
+            config.set(sectionName, patch, Manager.UserChoices[patch].get())
 
 def loadGameConfig(Manager, config):
     # Load UltraCam Beyond new patches.
-    patch_info = Manager.ultracam_beyond.get("Keys", [""])
-    GameID = Manager._patchInfo.ID
+    for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
+        patch_info = value
+        GameID = Manager._patchInfo.ID
 
-    if not config.has_section(GameID):
-        return
+        for itemName in value:
+            Manager.UserConfigs[itemName] = key
 
-    for patch in Manager.UserChoices:
-        patch_dict = patch_info[patch]
-        patch_class = patch_dict["Class"]
-        patch_default = patch_dict["Default"]
-        if patch_class.lower() == "dropdown":
-            patch_Names = patch_dict["Name_Values"]
+        if not config.has_section(GameID):
+            return
+
+        for patch in Manager.UserChoices:
             try:
-                PatchIndex = int(config.get(GameID, patch))
-                Manager.UserChoices[patch].set(patch_Names[PatchIndex])
-            except KeyError:
-                pass
-            except ValueError:
-                if config[Manager._patchInfo.ID][patch] == "auto":
-                    PatchIndex = int(patch_default)
+                patch_dict = patch_info[patch]
+            except Exception as e:
+                continue
+
+            patch_class = patch_dict["Class"]
+            patch_default = patch_dict["Default"]
+            if patch_class.lower() == "dropdown":
+                patch_Names = patch_dict["Name_Values"]
+                try:
+                    PatchIndex = int(config.get(GameID, patch))
                     Manager.UserChoices[patch].set(patch_Names[PatchIndex])
-                    continue
+                except KeyError:
+                    pass
+                except ValueError:
+                    if config[Manager._patchInfo.ID][patch] == "auto":
+                        PatchIndex = int(patch_default)
+                        Manager.UserChoices[patch].set(patch_Names[PatchIndex])
+                        continue
+                except (configparser.NoOptionError, KeyError):
+                    pass
+                continue
+            if patch_class.lower() == "scale":
+                # use name for tag accuracy
+                Manager.maincanvas.itemconfig(patch_dict["Name"], text=Manager.UserChoices[patch].get())
+            try:
+                patch_type = patch_dict["Type"]
+
+                if patch_type == "f32":
+                    Manager.UserChoices[patch].set(float(config.get(GameID, patch)))
+                else:
+                    Manager.UserChoices[patch].set(config.get(GameID, patch))
             except (configparser.NoOptionError, KeyError):
                 pass
-            continue
-        if patch_class.lower() == "scale":
-            # use name for tag accuracy
-            Manager.maincanvas.itemconfig(patch_dict["Name"], text=Manager.UserChoices[patch].get())
-        try:
-            patch_type = patch_dict["Type"]
-
-            if patch_type == "f32":
-                Manager.UserChoices[patch].set(float(config.get(GameID, patch)))
-            else:
-                Manager.UserChoices[patch].set(config.get(GameID, patch))
-        except (configparser.NoOptionError, KeyError):
-            pass
-        try:
-            if patch_class.lower() == "bool":
-                Manager.UserChoices[patch].set(config.get(GameID, patch))
-        except (configparser.NoOptionError, KeyError):
-            pass
-    
-    Manager._EmulatorScale.set(config.get(GameID, "emuscale", fallback=1))
+            try:
+                if patch_class.lower() == "bool":
+                    Manager.UserChoices[patch].set(config.get(GameID, patch))
+            except (configparser.NoOptionError, KeyError):
+                pass
+        
+        Manager._EmulatorScale.set(config.get(GameID, "emuscale", fallback=1))
 
 def save_user_choices(Manager, config_file, Legacy_path=None):
     log.info(f"Saving user choices in {localconfig}")

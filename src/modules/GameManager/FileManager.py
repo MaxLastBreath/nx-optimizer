@@ -348,11 +348,11 @@ class FileManager:
         if filemgr.is_extracting is True:
             Folder = os.path.join(os.getcwd(), "Extracted Files")
             os.makedirs(Folder, exist_ok=True)
-            return os.path.join(Folder, PatchInfo.ModName, PatchInfo.Config)
+            return os.path.join(Folder, PatchInfo.ModName, PatchInfo.ConfigPath)
         if PatchInfo.isSDconfig is True:
-            return os.path.join(SdCard, PatchInfo.Config)
+            return os.path.join(SdCard, PatchInfo.ConfigPath)
         else:
-            return os.path.join(filemgr.contentID, PatchInfo.ModName, PatchInfo.Config)
+            return os.path.join(filemgr.contentID, PatchInfo.ModName, PatchInfo.ConfigPath)
 
     @classmethod
     def Copyright(filemgr):
@@ -525,27 +525,44 @@ class FileManager:
                 os.makedirs(ini_file_directory, exist_ok=True)
 
                 log.info(f"Opening {modName} config file...")
+                
+                keys_list = set()
 
-                config = configparser.ConfigParser()
-                config.optionxform = lambda option: option
-                if os.path.exists(ini_file_path):
-                    config.read(ini_file_path, encoding="utf-8")
+                for cfg in filemgr._manager.UserConfigs:
+                    data = filemgr._manager.UserConfigs[cfg]
+                    
+                    if isinstance(data, list):
+                        keys_list.update(data)
+                    else:
+                        keys_list.add(data)
 
-                log.info(f"Starting {modName} Patcher...")
+                for configName in keys_list:
+                    config = configparser.ConfigParser()
+                    config.optionxform = lambda option: option
 
-                ## TOTK UC BEYOND AUTO PATCHER
-                try:
-                    ModCreator.UCAutoPatcher(filemgr._manager, config)
-                    ModCreator.UCResolutionPatcher(filemgr, filemgr._manager, config)
-                    ModCreator.UCAspectRatioPatcher(filemgr._manager, config)
-                except Exception as e:
-                    log.error(f"Failed to patch {modName} config with Error : {e}")
+                    if (configName != "Keys"):
+                        configFile = os.path.join(ini_file_path, configName + ".ini")
+                    else:
+                        configFile = ini_file_path ## compatibility for old patches
 
-                log.info(f"Starting {modName} Patcher has finished running...")
+                    if os.path.exists(configFile):
+                        config.read(configFile, encoding="utf-8")
 
-                ## WRITE IN CONFIG FILE FOR UC 2.0
-                with open(ini_file_path, "w+", encoding="utf-8") as configfile:
-                    config.write(configfile)
+                    log.info(f"Starting {modName} Patcher... Patching {configFile}")
+
+                    ## TOTK UC BEYOND AUTO PATCHER
+                    try:
+                        ModCreator.UCAutoPatcher(filemgr._manager, config, configName)
+                        ModCreator.UCResolutionPatcher(filemgr, filemgr._manager, config, configName)
+                        ModCreator.UCAspectRatioPatcher(filemgr._manager, config, configName)
+                    except Exception as e:
+                        log.error(f"Failed to patch {modName} config with Error : {e}")
+
+                    log.info(f"Starting {modName} Patcher has finished running...")
+
+                    ## WRITE IN CONFIG FILE FOR UC 2.0
+                    with open(configFile, "w+", encoding="utf-8") as configfile:
+                        config.write(configfile)
 
         def Exe_Running():
 
