@@ -545,6 +545,8 @@ class FileManager:
                     else:
                         configFile = ini_file_path ## compatibility for old patches
 
+                    os.makedirs(os.path.dirname(configFile), exist_ok=True)
+
                     if os.path.exists(configFile):
                         config.read(configFile, encoding="utf-8")
 
