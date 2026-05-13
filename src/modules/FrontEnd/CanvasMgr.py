@@ -99,6 +99,8 @@ class Canvas_Create:
         is_active: bool = True,
     ) -> ttk.Combobox:
 
+        tags = list(tags) if tags else []
+
         # create text
         active_color_new = active_color
         if tag is not None:
@@ -206,7 +208,9 @@ class Canvas_Create:
         command: None = None,
         is_active: bool = True,
     ) -> ttk.Variable:
-        
+
+        tags = list(tags) if tags else []
+
         # create text
         active_color_new = active_color
         if tag is not None:
@@ -385,6 +389,8 @@ class Canvas_Create:
         style: str = "success",
     ) -> ttk.StringVar:
 
+        tags = list(tags) if tags else []
+
         # create text
         active_color_new = active_color
         if tag is not None:
@@ -483,6 +489,8 @@ class Canvas_Create:
         command: any = None,
     ):
 
+        tags = list(tags) if tags else []
+
         # create text
         if tag is not None:
             tags.append(tag)
@@ -536,12 +544,14 @@ class Canvas_Create:
         command: any = None,
     ):
 
+        tags = list(tags) if tags else []
+
         # create text
         if tag is not None:
             tags.append(tag)
         if command is not None and active_fill is None:
             active_fill = active_color
-            
+
         outline_tag = [outline_tag]
         for _tag in tags:
             outline_tag.append(_tag)
@@ -718,7 +728,12 @@ class Canvas_Create:
 
     @classmethod
     def hide_tooltip(cls):
-        cls.tooltip.destroy()
+        if cls.tooltip is not None:
+            try:
+                cls.tooltip.destroy()
+            except Exception:
+                pass
+            cls.tooltip = None
         cls.tooltip_active = False
 
     @classmethod

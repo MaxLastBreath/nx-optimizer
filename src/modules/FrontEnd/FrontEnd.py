@@ -10,13 +10,14 @@ from modules.FrontEnd.TextureMgr import TextureMgr
 from modules.FrontEnd.Localization import Localization
 from modules.load_elements import create_tab_buttons, load_UI_elements
 from modules.FrontEnd.FrontEndMode import NxMode
+from modules.FrontEnd.ScrollableCanvas import ScrollableCanvas
 import threading, webbrowser, os, copy
 import ttkbootstrap as ttk
 
 
 def increase_row(row, cul_sel, cul_tex):
     row += 40
-    if row >= 480:
+    if row >= 800:
         row = 160
         cul_tex += 180
         cul_sel += 180
@@ -226,7 +227,7 @@ class Manager:
                         cul=pos[1],
                         drop_cul=pos[2],
                         width=100,
-                        tags=["dropdown", "patchinfo"],
+                        tags=["dropdown", "patchinfo", "scrollable"],
                         tag=section_auto,
                         text_description=patch_description,
                         command=(lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)) if name == "resolution" else None
@@ -252,7 +253,7 @@ class Manager:
                         drop_cul=pos[2],
                         width=100,
                         increments=float(patch_increments),
-                        tags=["scale", "patchinfo"],
+                        tags=["scale", "patchinfo", "scrollable"],
                         tag=section_auto,
                         text_description=patch_description,
                     )
@@ -269,24 +270,30 @@ class Manager:
                     pos[2] = new_pos[2]
 
                 if dicts["Class"].lower() == "bool":
+                    bool_col_stride = 180
+                    bool_col_idx = pos[6]
                     patch_var = Canvas_Create.create_checkbutton(
                         master=Manager._window,
                         canvas=canvas,
                         text=patch_name,
                         variable="Off",
                         row=pos[3],
-                        cul=pos[4],
-                        drop_cul=pos[5],
-                        tags=["bool", "patchinfo"],
+                        cul=pos[4] + bool_col_idx * bool_col_stride,
+                        drop_cul=pos[5] + bool_col_idx * bool_col_stride,
+                        tags=["bool", "patchinfo", "scrollable"],
                         tag=section_auto,
                         text_description=patch_description,
                     )
                     if patch_default_index:
                         patch_var.set("On")
-                    new_pos = increase_row(pos[3], pos[4], pos[5])
-                    pos[3] = new_pos[0]
-                    pos[4] = new_pos[1]
-                    pos[5] = new_pos[2]
+                    bool_col_idx += 1
+                    if bool_col_idx >= 2:
+                        bool_col_idx = 0
+                        new_pos = increase_row(pos[3], pos[4], pos[5])
+                        pos[3] = new_pos[0]
+                        pos[4] = new_pos[1]
+                        pos[5] = new_pos[2]
+                    pos[6] = bool_col_idx
 
                 if patch_var is None:
                     continue
@@ -307,17 +314,27 @@ class Manager:
                     drop_cul=pos[2],
                     width=100,
                     increments=int(1),
-                    tags=["scale", "patchinfo"],
+                    tags=["scale", "patchinfo", "scrollable"],
                     tag="main",
                     text_description="ResScale",
                     command=lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)
                 )
                 Manager._EmulatorScale.set(1)
-        
+
+        if hasattr(canvas, "set_content_height"):
+            max_row = max(
+                max(v[0], v[3]) for v in pos_dict.values()
+            )
+            canvas.update_idletasks()
+            canvas.set_content_height(scale(max_row + 60))
+
     def DeletePatches(Manager):
         Manager.UserChoices.clear()
         Manager.UserConfigs.clear()
-        Manager.all_canvas[0].delete("patchinfo")
+        canvas = Manager.all_canvas[0]
+        canvas.delete("patchinfo")
+        if hasattr(canvas, "reset_scroll"):
+            canvas.reset_scroll()
 
     def CreatePresets(Manager, row=40, cul_tex=60, cul_sel=220):
 
@@ -346,8 +363,12 @@ class Manager:
         Manager.UserChoices = {}
 
         # Create Canvas
-        Manager.maincanvas = ttk.Canvas(
-            Manager._window, width=scale(1200), height=scale(600)
+        Manager.maincanvas = ScrollableCanvas(
+            Manager._window,
+            viewport=(20, 150, 760, 460),
+            columns=[(20, 363), (380, 775)],
+            width=scale(1200),
+            height=scale(600),
         )
 
         canvas = Manager.maincanvas
@@ -560,8 +581,8 @@ class Manager:
         ##              REMOVED DFPS, SINCE ULTRACAM BEYOND DOES IT ALL AND SO MUCH BETTER.
 
         pos_dict = {
-            "main": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2],
-            "extra": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2],
+            "main": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2, 0],
+            "extra": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2, 0],
         }
 
         Manager.Back_Pos = copy.deepcopy(pos_dict)
@@ -728,15 +749,22 @@ class Manager:
         Cheats.Show()
 
     def toggle_pages(Manager, ShowPage: str):
-        Manager.maincanvas.itemconfig(ShowPage, state="normal")
+        canvas = Manager.maincanvas
 
         for button in Manager.PageBtns:
             if button.Name != ShowPage:
-                Manager.maincanvas.itemconfig(button.Name, state="hidden")
+                if hasattr(canvas, "hide_tag"):
+                    canvas.hide_tag(button.Name)
+                else:
+                    canvas.itemconfig(button.Name, state="hidden")
                 log.info(f"Hiding {button.Name}")
                 button.set(False)
                 button.ToggleImg(WidgetState.Leave)
             else:
+                if hasattr(canvas, "show_tag"):
+                    canvas.show_tag(button.Name)
+                else:
+                    canvas.itemconfig(button.Name, state="normal")
                 button.ToggleImg(WidgetState.Enter)
 
     def open_browser(Manager, web, event=None):

@@ -1,6 +1,7 @@
 import ttkbootstrap as ttk
 from modules.FrontEnd.CanvasMgr import Canvas_Create
 from modules.FrontEnd.TextureMgr import TextureMgr
+from modules.FrontEnd.ScrollableCanvas import ScrollableCanvas
 from modules.GameManager.FileManager import FileManager
 from modules.GameManager.PatchInfo import PatchInfo
 from modules.load_elements import create_tab_buttons
@@ -74,7 +75,13 @@ class Cheats:
             raise "Cheat Canvas is Already Created"
 
         # Create Canvas
-        canvas = ttk.Canvas(manager._window, width=scale(1200), height=scale(600))
+        canvas = ScrollableCanvas(
+            manager._window,
+            viewport=(20, 28, 1020, 500),
+            columns=[(20, 1175)],
+            width=scale(1200),
+            height=scale(600),
+        )
 
         canvas.pack(expand=1, fill="both")
         manager.cheatcanvas = canvas
@@ -164,8 +171,11 @@ class Cheats:
         "Load Cheats on the canvas."
 
         row = 40
-        cul_tex = 40
-        cul_sel = 200
+        col_idx = 0
+        num_cols = 5
+        col_stride = 240
+        base_cul_tex = 30
+        base_cul_sel = 195
 
         try:
             index = Cheats.versionvalues.index(Cheats.CheatVersion.get())
@@ -193,6 +203,8 @@ class Cheats:
 
         Cheats.CheatsInfo = {}
 
+        if hasattr(Cheats.Canvas, "reset_scroll"):
+            Cheats.Canvas.reset_scroll()
         Cheats.Canvas.delete("cheats")
 
         for version_option_name, version_option_value in sorted_cheats.items():
@@ -208,6 +220,9 @@ class Cheats:
                 "Cheat Example",
             ]:
 
+                cul_tex = base_cul_tex + col_idx * col_stride
+                cul_sel = base_cul_sel + col_idx * col_stride
+
                 version_option_var = Canvas_Create.create_checkbutton(
                     master=Cheats._manager._window,
                     canvas=Cheats.Canvas,
@@ -216,7 +231,7 @@ class Cheats:
                     row=row,
                     cul=cul_tex,
                     drop_cul=cul_sel,
-                    tags=["text"],
+                    tags=["text", "scrollable"],
                     tag="cheats",
                     description_name=version_option_name,
                 )
@@ -231,12 +246,14 @@ class Cheats:
             else:
                 continue
 
-            row += 40
+            col_idx += 1
+            if col_idx >= num_cols:
+                col_idx = 0
+                row += 40
 
-            if row > 480:
-                row = 40
-                cul_tex += 200
-                cul_sel += 200
+        if hasattr(Cheats.Canvas, "set_content_height"):
+            Cheats.Canvas.update_idletasks()
+            Cheats.Canvas.set_content_height(scale(row + 60))
 
     @classmethod
     @method_call_decorator
