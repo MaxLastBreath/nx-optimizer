@@ -32,8 +32,15 @@ class ProgressBar:
         label.pack(pady=10)
         cls.progress_bar = ttk.Progressbar(cls.progress_window, mode="determinate", maximum=total_iterations)
         cls.progress_bar.pack(pady=20)
-        task_thread = threading.Thread(target=tasks)
-        task_thread.start() 
+        def _safe_tasks():
+            try:
+                tasks()
+            except Exception as e:
+                log.error(f"Task thread crashed: {e!r}")
+                cls.progress_window.after(0, cls.Destroy)
+
+        task_thread = threading.Thread(target=_safe_tasks)
+        task_thread.start()
 
     @classmethod
     def Destroy(cls):
