@@ -1,4 +1,4 @@
-from PIL import ImageTk
+from PIL import Image as PILImage, ImageTk
 from modules.FrontEnd.CanvasMgr import Canvas_Create
 
 
@@ -27,6 +27,22 @@ class TextureMgr:
                 return Entry.Object
 
         raise f"Texture Doesn't exist {Name}"
+
+    @classmethod
+    def CreateCompositeTexture(cls, name, image_paths):
+        """Precomposite multiple full-canvas RGBA images into one PhotoImage.
+        Reduces per-frame CoreGraphics RGBA compositing passes on macOS."""
+        from modules.scaling import sf
+        w, h = int(1200 * sf), int(600 * sf)
+        base = PILImage.new("RGBA", (w, h), (0, 0, 0, 0))
+        for path in image_paths:
+            full_path = Canvas_Create.get_UI_path(path)
+            img = PILImage.open(full_path).resize((w, h), PILImage.LANCZOS)
+            if img.mode != "RGBA":
+                img = img.convert("RGBA")
+            base = PILImage.alpha_composite(base, img)
+        photo = ImageTk.PhotoImage(base)
+        cls.AppendTexture(Texture(name, photo))
 
     @classmethod
     def CreateTexture(
@@ -191,10 +207,10 @@ class TextureMgr:
             width=int(72 * 1.2),
             height=int(114 * 1.2),
         )
-        TextureMgr.CreateTexture(
-            image_path="BG_Left_2.png",
-            width=1200,
-            height=600,
+        # ponytail: precomposite static overlays → 1 RGBA pass/frame instead of 2
+        TextureMgr.CreateCompositeTexture(
+            "ui_static_overlay",
+            ["BG_Left_2.png", "BG_Right_UI.png"],
         )
         TextureMgr.CreateTexture(
             image_path="BG_Left_Cheats.png",
@@ -203,11 +219,6 @@ class TextureMgr:
         )
         TextureMgr.CreateTexture(
             image_path="BG_Left.png",
-            width=1200,
-            height=600,
-        )
-        TextureMgr.CreateTexture(
-            image_path="BG_Right_UI.png",
             width=1200,
             height=600,
         )

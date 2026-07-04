@@ -145,14 +145,27 @@ class ImageButton:
 
     def Animation(self):
         try:
-            if self.__IsHovering is False:
+            if not self.__IsHovering:
+                return
+        
+            if not self._Images:
                 return
 
-            if self.__AniIndex + 1 > len(self._Images):
-                self.__AniIndex = 1
+            if hasattr(self, "_last_drawn_index"):
+                if self.__AniIndex == self._last_drawn_index:
+                    return
 
-            self._Canvas.itemconfig(self.Tag, image=self._Images[self.__AniIndex])
+            next_index = self.__AniIndex +1
+            if next_index > len(self._Images):
+                next_index = 0
 
-            self.__AniIndex += 1
+            self._Canvas.itemconfig(
+                self.Tag,
+                image=self._Images(self.__AniIndex)
+            )
+                
+            self._last_drawn_index = self.__AniIndex
+            self.__AniIndex = next_index
+        
         except Exception:
             pass
