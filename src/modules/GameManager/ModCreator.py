@@ -43,7 +43,7 @@ class ResolutionVector:
         """Get the Estimated Ram Layout."""
 
         layout = 0
-        if self.getFullScale() < 0:
+        if self.getFullScale() < 1:
             layout = 0
         if self.getFullScale() > 1:
             layout = 1
@@ -110,48 +110,46 @@ class ModCreator:
         config (configparser): The config file parser.
         """
 
-        for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
-            if (key is not Name):
+        patch_info = Manager.UltracamPatchJson.get(Name)
+        if patch_info is None:
+            return
+
+        for patch in Manager.UserChoices:
+            if patch.lower() in ["resolution", "aspect ratio"]:
                 continue
 
-            patch_info = value
+            try:
+                patch_dict = patch_info[patch]
+            except Exception as e:
+                continue
 
-            for patch in Manager.UserChoices:
-                if patch.lower() in ["resolution", "aspect ratio"]:
-                    continue
+            patch_class = patch_dict["Class"]
+            patch_Config = patch_dict["Config_Class"]
+            patch_Default = patch_dict["Default"]
 
-                try:
-                    patch_dict = patch_info[patch]
-                except Exception as e:
-                    continue
+            # Ensure we have the section required.
+            if not Config.has_section(patch_Config[0]):
+                Config[patch_Config[0]] = {}
 
-                patch_class = patch_dict["Class"]
-                patch_Config = patch_dict["Config_Class"]
-                patch_Default = patch_dict["Default"]
-
-                # Ensure we have the section required.
-                if not Config.has_section(patch_Config[0]):
-                    Config[patch_Config[0]] = {}
-
-                # In case we have an auto patch.
-                # fmt: off
-                if Manager.UserChoices[patch] == "auto" or Manager.UserChoices[patch].get() == "auto":
-                    if patch_class.lower() == "dropdown":
-                        patch_Names = patch_dict["Values"]
-                        Config[patch_Config[0]][patch_Config[1]] = str(patch_Names[patch_Default])
-                    else:
-                        Config[patch_Config[0]][patch_Config[1]] = str(patch_Default)
-                    continue
-
-                if patch_class.lower() == "bool" or patch_class.lower() == "scale":
-                    Config[patch_Config[0]][patch_Config[1]] = Manager.UserChoices[patch].get()
-
+            # In case we have an auto patch.
+            # fmt: off
+            if Manager.UserChoices[patch] == "auto" or Manager.UserChoices[patch].get() == "auto":
                 if patch_class.lower() == "dropdown":
-                    # exclusive to dropdown.
-                    patch_Names = patch_dict["Name_Values"]
-                    patch_Values = patch_dict["Values"]
-                    index = patch_Names.index(Manager.UserChoices[patch].get())
-                    Config[patch_Config[0]][patch_Config[1]] = str(patch_Values[index])
+                    patch_Names = patch_dict["Values"]
+                    Config[patch_Config[0]][patch_Config[1]] = str(patch_Names[patch_Default])
+                else:
+                    Config[patch_Config[0]][patch_Config[1]] = str(patch_Default)
+                continue
+
+            if patch_class.lower() == "bool" or patch_class.lower() == "scale":
+                Config[patch_Config[0]][patch_Config[1]] = Manager.UserChoices[patch].get()
+
+            if patch_class.lower() == "dropdown":
+                # exclusive to dropdown.
+                patch_Names = patch_dict["Name_Values"]
+                patch_Values = patch_dict["Values"]
+                index = patch_Names.index(Manager.UserChoices[patch].get())
+                Config[patch_Config[0]][patch_Config[1]] = str(patch_Values[index])
 
     @classmethod
     def UCRyujinxRamPatcher(cls, manager, filemgr, layout):
@@ -178,13 +176,12 @@ class ModCreator:
     def UCLegacyRamPatcher(cls, Manager, FileMgr, Layout):
         """Patches bunch of settings in Legacy Emulators, VRAM, RAM etc. Based on Resolution and shadow resolution outputs mostly."""
 
-        write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Core", "memory_layout_mode", str(Layout))  # fmt: skip
-        write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "System", "use_docked_mode", "true")  # fmt: skip
-
-        if Layout > 0:
-            write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "vram_usage_mode", "1")  # fmt: skip
-        else:
-            write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "vram_usage_mode", "0")  # fmt: skip
+        settings = {
+            ("Core", "memory_layout_mode"): str(Layout),
+            ("System", "use_docked_mode"): "true",
+            ("Renderer", "vram_usage_mode"): "1" if Layout > 0 else "0",
+        }
+        write_Legacy_configs(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, settings)
 
     @classmethod
     def UCResolutionPatcher(cls, FileMgr, Manager, Config, Name):
@@ -200,53 +197,56 @@ class ModCreator:
         config (configparser): The config file parser.
         """
 
-        for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
-            if (key is not Name):
-                continue
-    
-            patch_info = value
+        patch_info = Manager.UltracamPatchJson.get(Name)
+        if patch_info is None:
+            return
 
-            try:
-                resolution = Manager.UserChoices["resolution"].get()
-            except Exception:
-                resolution = 1
+        try:
+            resolution = Manager.UserChoices["resolution"].get()
+        except Exception:
+            resolution = patch_info["resolution"]["Name_Values"][patch_info["resolution"]["Default"]]
 
-            if "shadows" in patch_info:
-                shadows = int(Manager.UserChoices["shadow resolution"].get().split("x")[0])
-            else:
-                shadows = 1024
+        if "shadows" in patch_info:
+            shadows = int(Manager.UserChoices["shadow resolution"].get().split("x")[0])
+        else:
+            shadows = 1024
 
-            ResInfo = patch_info["resolution"]["Values"][
-                patch_info["resolution"]["Name_Values"].index(resolution)
-            ].split("x")
+        ResInfo = patch_info["resolution"]["Values"][
+            patch_info["resolution"]["Name_Values"].index(resolution)
+        ].split("x")
 
-            Resolution = ResolutionVector(ResInfo[0], ResInfo[1])
-            Resolution.addShadows(shadows)
+        Resolution = ResolutionVector(ResInfo[0], ResInfo[1])
+        Resolution.addShadows(shadows)
 
-            if NxMode.isLegacy():
-                # for emulator scale
-                new_scale = 2
-                if (Manager._patchInfo.ResolutionScale):
-                    emuscale = int(Manager._EmulatorScale.get())
-                    new_scale += emuscale - 1
+        if NxMode.isLegacy():
+            # for emulator scale
+            new_scale = 2
+            if (Manager._patchInfo.ResolutionScale):
+                emuscale = int(Manager._EmulatorScale.get())
+                new_scale += emuscale - 1
 
-                write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "resolution_setup", f"{new_scale}")  # fmt: skip
-                cls.UCLegacyRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
+            # eden/citron-neo insert an extra entry at the start of the resolution_setup enum
+            emuName = FileMgr.LegacyEmuName()
+            if "eden" in emuName or ("citron" in emuName and "neo" in emuName):
+                new_scale += 1
 
-            if NxMode.isRyujinx():
-                new_scale = 1
-                if (Manager._patchInfo.ResolutionScale):
-                    new_scale = int(Manager._EmulatorScale.get())
+            write_Legacy_configs(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, {("Renderer", "resolution_setup"): f"{new_scale}"})  # fmt: skip
+            cls.UCLegacyRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
 
-                write_ryujinx_config(FileMgr, FileMgr._emuconfig, "res_scale", new_scale)  # fmt: skip
-                cls.UCRyujinxRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
+        if NxMode.isRyujinx():
+            new_scale = 1
+            if (Manager._patchInfo.ResolutionScale):
+                new_scale = int(Manager._EmulatorScale.get())
 
-            Section = patch_info["resolution"]["Config_Class"][0]
-            Width = patch_info["resolution"]["Config_Class"][1]
-            Height = patch_info["resolution"]["Config_Class"][2]
+            write_ryujinx_config(FileMgr, FileMgr._emuconfig, "res_scale", new_scale)  # fmt: skip
+            cls.UCRyujinxRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
 
-            Config[Section][Width] = str(int(Resolution.w))
-            Config[Section][Height] = str(int(Resolution.h))
+        Section = patch_info["resolution"]["Config_Class"][0]
+        Width = patch_info["resolution"]["Config_Class"][1]
+        Height = patch_info["resolution"]["Config_Class"][2]
+
+        Config[Section][Width] = str(int(Resolution.w))
+        Config[Section][Height] = str(int(Resolution.h))
 
     @classmethod
     def UCAspectRatioPatcher(cls, Manager, Config, Name):
@@ -258,24 +258,22 @@ class ModCreator:
         config (configparser): The config file parser.
         """
 
-        for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
-            if (key is not Name):
-                continue
+        patch_info = Manager.UltracamPatchJson.get(Name)
+        if patch_info is None:
+            return
 
-            patch_info = value
+        if "aspect" not in patch_info:
+            return
 
-            if "aspect" not in patch_info:
-                return
+        ARIndex = patch_info["aspect"]["Name_Values"].index(
+            Manager.UserChoices["aspect"].get()
+        )
+        AspectList = patch_info["aspect"]["Values"][ARIndex]
+        AspectRatio = ResolutionVector(AspectList[0], AspectList[1])
 
-            ARIndex = patch_info["aspect"]["Name_Values"].index(
-                Manager.UserChoices["aspect"].get()
-            )
-            AspectList = patch_info["aspect"]["Values"][ARIndex]
-            AspectRatio = ResolutionVector(AspectList[0], AspectList[1])
+        Section = patch_info["aspect"]["Config_Class"][0]
+        Width = patch_info["aspect"]["Config_Class"][1]
+        Height = patch_info["aspect"]["Config_Class"][2]
 
-            Section = patch_info["aspect"]["Config_Class"][0]
-            Width = patch_info["aspect"]["Config_Class"][1]
-            Height = patch_info["aspect"]["Config_Class"][2]
-
-            Config[Section][Width] = str(AspectRatio.w)
-            Config[Section][Height] = str(AspectRatio.h)
+        Config[Section][Width] = str(AspectRatio.w)
+        Config[Section][Height] = str(AspectRatio.h)

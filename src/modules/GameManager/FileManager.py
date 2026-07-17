@@ -73,18 +73,42 @@ class FileManager:
                     "no saves have been moved!")
     
     @classmethod
-    # fmt: off
     def read_configpath(filemgr):
-        if NxMode.isLegacy():
-            config = configparser.ConfigParser()
-            config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
-            Legacy_path = config.get('Paths', 'Legacypath', fallback="Appdata")
-            return Legacy_path
-        if NxMode.isRyujinx():
-            config = configparser.ConfigParser()
-            config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
-            ryujinx_path = config.get('Paths', 'ryujinxpath', fallback="Appdata")
-            return ryujinx_path
+        key = "Legacypath" if NxMode.isLegacy() else "ryujinxpath"
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
+        return config.get('Paths', key, fallback="Appdata")
+
+    @classmethod
+    def LegacyEmuName(filemgr) -> str:
+        """Lowercase identifier of the active Legacy fork, or empty when unknown."""
+
+        if filemgr._emuselect:
+            return filemgr._emuselect.lower()
+        if filemgr._emulist:
+            return filemgr._emulist[0].lower()
+
+        configpath = filemgr.read_configpath()
+        if configpath and configpath != "Appdata":
+            return os.path.splitext(os.path.basename(configpath))[0].lower()
+
+        if filemgr._emuglobal:
+            return os.path.basename(os.path.normpath(filemgr._emuglobal)).lower()
+
+        return ""
+
+    @classmethod
+    def __UserDataRoot(filemgr) -> str | None:
+        """OS-specific user data root that Legacy emulators install under."""
+
+        SpecialDir = {"Windows": "AppData/Roaming", "Linux": ".local/share"}.get(filemgr.os_platform)
+        if SpecialDir is None:
+            return None
+        return os.path.join(filemgr.home_directory, SpecialDir)
+
+    @classmethod
+    def __PortableFolder(filemgr, subfolder: str) -> str:
+        return os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), subfolder))
 
     @classmethod
     # fmt: off
@@ -93,26 +117,21 @@ class FileManager:
 
         filemgr._emulist = []
 
-        if (filemgr.os_platform == "Windows"):
-            SpecialDir = "AppData/Roaming"
-        elif filemgr.os_platform == "Linux":
-            SpecialDir = ".local/share"
-
-        userDir = os.path.join(filemgr.home_directory, SpecialDir)
+        userDir = filemgr.__UserDataRoot()
         for folder in os.listdir(userDir):
             FolderPath = os.path.join(userDir, folder)
             if os.path.exists(os.path.join(FolderPath, "load", GameID)):
                 filemgr._emulist.append(folder)
                 superlog.info(f"Found Legacy Emu folder at: {FolderPath}")
                 continue
-        
+
         if len(filemgr._emulist) < 1: # Fallback to citron
-            base_directory = os.path.join(filemgr.home_directory, SpecialDir, "citron")
+            base_directory = os.path.join(userDir, "citron")
         else:
             EmuDir = None
-            if (filemgr._emuselect is not None) : 
-                EmuDir = os.path.join(filemgr.home_directory, SpecialDir, filemgr._emuselect)
-            base_directory = EmuDir if EmuDir is not None else os.path.join(filemgr.home_directory, SpecialDir, filemgr._emulist[0])
+            if (filemgr._emuselect is not None) :
+                EmuDir = os.path.join(userDir, filemgr._emuselect)
+            base_directory = EmuDir if EmuDir is not None else os.path.join(userDir, filemgr._emulist[0])
 
         return base_directory
     
@@ -139,21 +158,25 @@ class FileManager:
         return None
         
     @classmethod
+    def __RyujinxBase(filemgr) -> str:
+        home = filemgr.home_directory
+        if filemgr.os_platform == "Windows":
+            return os.path.join(home, "AppData", "Roaming", "Ryujinx")
+        if filemgr.os_platform == "Darwin":
+            return os.path.join(home, "Library", "Application Support", "Ryujinx")
+        if filemgr.os_platform == "Linux":
+            base = os.path.join(home, ".config", "Ryujinx")
+            flatpak = os.path.join(home, ".var", "app", "org.ryujinx.Ryujinx", "config", "Ryujinx")
+            return flatpak if os.path.exists(flatpak) else base
+        return home
+
+    @classmethod
     # fmt: off
     def __PopulateRyujinx(filemgr):
         patchinfo = filemgr._manager._patchInfo
-        portablefolder = os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), "portable/"))
+        portablefolder = filemgr.__PortableFolder("portable/")
 
-        base_directory = filemgr.home_directory
-        if (filemgr.os_platform == "Windows"):
-            base_directory = os.path.join(filemgr.home_directory, "AppData", "Roaming", "Ryujinx")
-        elif filemgr.os_platform == "Darwin":
-            base_directory = os.path.join(filemgr.home_directory, "Library", "Application Support", "Ryujinx")
-        if filemgr.os_platform == "Linux":
-            base_directory = os.path.join(filemgr.home_directory, ".config", "Ryujinx")
-            flatpak = os.path.join(filemgr.home_directory, ".var", "app", "org.ryujinx.Ryujinx", "config", "Ryujinx")
-            if(os.path.exists(flatpak)):
-                base_directory = flatpak
+        base_directory = filemgr.__RyujinxBase()
         if (os.path.exists(portablefolder)):
             base_directory = portablefolder
 
@@ -168,7 +191,7 @@ class FileManager:
     @classmethod
     # fmt: off
     def __PopulateLegacy(filemgr):
-        portablefolder = os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), "user/"))
+        portablefolder = filemgr.__PortableFolder("user/")
 
         base_directory = filemgr.home_directory
         patchinfo = filemgr._manager._patchInfo
@@ -264,12 +287,13 @@ class FileManager:
 
         filemgr.__SelectEmulator()
 
+        GameName = filemgr._manager._patchInfo.Name
+
         if NxMode.isLegacy():
             testforuserdir = os.path.join(
                 filemgr.nand, "user", "save", "0000000000000000"
             )
             target_folder = filemgr._manager._patchInfo.ID
-            GameName = filemgr._manager._patchInfo.Name
 
             log.info(testforuserdir)
 
@@ -413,8 +437,8 @@ class FileManager:
             
             row +=40
 
-            def Wee(event, Emu):
-                log.error(f"WEEE {Emu}")
+            def SelectEmu(event, Emu):
+                log.info(f"Selected Emulator {Emu}")
                 filemgr._emuselect = Emu
                 Dialogue.destroy()
 
@@ -423,17 +447,157 @@ class FileManager:
             for emu in filemgr._emulist:
                 count+=1
                 Canvas_Create.create_label(
-                        Dialogue, 
+                        Dialogue,
                         canvas,
                         f"{count}: {emu}",
                         color=html_color["purple"],
-                        row = row, 
-                        command=lambda e, emu=emu: Wee(e, emu)
+                        row = row,
+                        command=lambda e, emu=emu: SelectEmu(e, emu)
                     )
                 row +=40
 
             Dialogue.wait_window()
             filemgr.checkpath()
+
+    @classmethod
+    def __CreateModPatch(filemgr, mode: str | None = None):
+        save_user_choices(filemgr._manager, filemgr._manager.config)
+
+        patchInfo = filemgr._manager._patchInfo
+        modDir = filemgr.contentID
+        modName = filemgr._manager._patchInfo.ModName
+
+        if mode == "Cheats":
+            ProgressBar.string.set("Creating Cheat Patches.")
+            ModCreator.CreateCheats()
+            return
+
+        elif mode == None:
+            log.info(f"Generating mod at {modDir}")
+            os.makedirs(modDir, exist_ok=True)
+
+            # Update progress bar
+            ProgressBar.string.set("NX-Optimizer Patching...")
+
+            filemgr.mod_whitelist.append(modName)
+            ini_file_path = filemgr.UltraCam_ConfigPath()
+
+            log.warning(f"Creating {modName} config File Path... {ini_file_path}\n")
+
+            ini_file_directory = os.path.dirname(ini_file_path)
+            os.makedirs(ini_file_directory, exist_ok=True)
+
+            log.info(f"Opening {modName} config file...")
+
+            keys_list = set()
+
+            for cfg in filemgr._manager.UserConfigs:
+                data = filemgr._manager.UserConfigs[cfg]
+
+                if isinstance(data, list):
+                    keys_list.update(data)
+                else:
+                    keys_list.add(data)
+
+            for configName in keys_list:
+                config = configparser.ConfigParser()
+                config.optionxform = lambda option: option
+
+                if (configName != "Keys"):
+                    configFile = os.path.join(ini_file_path, configName + ".ini")
+                else:
+                    configFile = ini_file_path ## compatibility for old patches
+
+                if os.path.exists(configFile):
+                    config.read(configFile, encoding="utf-8")
+
+                log.info(f"Starting {modName} Patcher... Patching {configFile}")
+
+                ## TOTK UC BEYOND AUTO PATCHER
+                try:
+                    ModCreator.UCAutoPatcher(filemgr._manager, config, configName)
+                    ModCreator.UCResolutionPatcher(filemgr, filemgr._manager, config, configName)
+                    ModCreator.UCAspectRatioPatcher(filemgr._manager, config, configName)
+                except Exception as e:
+                    log.error(f"Failed to patch {modName} config with Error : {e}")
+
+                log.info(f"Starting {modName} Patcher has finished running...")
+
+                ## WRITE IN CONFIG FILE FOR UC 2.0
+                with open(configFile, "w+", encoding="utf-8") as configfile:
+                    config.write(configfile)
+
+    @classmethod
+    def __CheckExeRunning(filemgr):
+
+        if (filemgr.os_platform != "Windows"):
+            log.info("Platform is not Windows, No need to check for Executable running.")
+            return
+
+        if NxMode.isLegacy():
+            emuName = filemgr.LegacyEmuName()
+            process_name = f"{emuName}.exe" if emuName else f"{NxMode.get()}.exe"
+        else:
+            process_name = "Ryujinx.exe"
+
+        is_Program_Opened = LaunchManager.is_process_running(process_name)
+
+        message = (
+            f"{process_name} is Running, \n"
+            f"The Optimizer Requires {process_name} to be closed."
+            f"\nDo you wish to close {process_name}?"
+        )
+        if is_Program_Opened is True:
+            response = messagebox.askyesno(
+                "Warning", message, icon=messagebox.WARNING
+            )
+            if response is True:
+                subprocess.run(
+                    ["taskkill", "/F", "/IM", process_name],
+                    check=True,
+                )
+        if is_Program_Opened is False:
+            log.info(f"{process_name} is closed, working as expected.")
+
+    @classmethod
+    def __DisableMods(filemgr):
+        ProgressBar.string.set(f"Disabling old mods...")
+        log.info("Disabling Outdated Mods...")
+
+        # Convert the lists to sets, removing any duplicates.
+        filemgr.mod_blacklist = set(filemgr.mod_blacklist)
+        filemgr.mod_whitelist = set(filemgr.mod_whitelist)
+
+        # Run the Main code to Enable and Disable necessary Mods, the remove ensures the mods are enabled.
+        if NxMode.isLegacy():
+
+            # read config to pass into disabled keys h
+            emuconfig = configparser.ConfigParser()
+            emuconfig.read(filemgr._emuconfig, encoding="utf-8")
+
+            for item in filemgr.mod_blacklist:
+                modify_disabled_key(
+                    filemgr._emuconfig,
+                    filemgr.contentID,
+                    emuconfig,
+                    filemgr._manager._patchInfo.IDtoNum(),
+                    item,
+                    action="add"
+                )
+
+            for item in filemgr.mod_whitelist:
+                modify_disabled_key(
+                    filemgr._emuconfig,
+                    filemgr.contentID,
+                    emuconfig,
+                    filemgr._manager._patchInfo.IDtoNum(),
+                    item,
+                    action="remove"
+                )
+
+        # fmt: off
+        if (NxMode.isRyujinx() and not filemgr.is_extracting):
+            enable_ryujinx_mods(filemgr.mod_blacklist, filemgr.mod_whitelist)
 
     @classmethod
     def submit(filemgr, mode: str | None = None):
@@ -453,7 +617,7 @@ class FileManager:
             for task in tasklist:
                 timer(com)
                 com += com
-                task
+                task()
                 time.sleep(0.05)
 
             ProgressBar.End(filemgr._manager)
@@ -461,10 +625,10 @@ class FileManager:
         def run_tasks():
             if mode == "Cheats":
                 superlog.info("Starting TASKs for Cheat Patch..")
-                tasklist = [Create_Mod_Patch("Cheats")]
+                tasklist = [lambda: filemgr.__CreateModPatch("Cheats")]
 
                 if get_setting("cheat-backup") in ["On"]:
-                    tasklist.append(filemgr.backup())
+                    tasklist.append(filemgr.backup)
 
                 run_tasklists(tasklist)
 
@@ -479,155 +643,22 @@ class FileManager:
                     filemgr.is_extracting = False
 
                 tasklist = [
-                    Exe_Running(),
-                    filemgr.__TransferMods(),
-                    Create_Mod_Patch(),
-                    Disable_Mods(),
-                    stop_extracting(),
-                    filemgr.Copyright()
+                    filemgr.__CheckExeRunning,
+                    filemgr.__TransferMods,
+                    filemgr.__CreateModPatch,
+                    filemgr.__DisableMods,
+                    stop_extracting,
+                    filemgr.Copyright,
                 ]
 
                 if get_setting("auto-backup") in ["On"]:
-                    tasklist.append(filemgr.backup())
-                
+                    tasklist.append(filemgr.backup)
+
                 run_tasklists(tasklist)
 
                 superlog.info(
                     "Tasks have been COMPLETED. Feel free to Launch the game."
                 )
                 return
-
-        def Create_Mod_Patch(mode: str | None = None):
-            save_user_choices(filemgr._manager, filemgr._manager.config)
-
-            patchInfo = filemgr._manager._patchInfo
-            modDir = filemgr.contentID
-            modName = filemgr._manager._patchInfo.ModName
-
-            if mode == "Cheats":
-                ProgressBar.string.set("Creating Cheat Patches.")
-                ModCreator.CreateCheats()
-                return
-
-            elif mode == None:
-                log.info(f"Generating mod at {modDir}")
-                os.makedirs(modDir, exist_ok=True)
-
-                # Update progress bar
-                ProgressBar.string.set("NX-Optimizer Patching...")
-
-                filemgr.mod_whitelist.append(modName)
-                ini_file_path = filemgr.UltraCam_ConfigPath()
-
-                log.warning(f"Creating {modName} config File Path... {ini_file_path}\n")
-
-                ini_file_directory = os.path.dirname(ini_file_path)
-                os.makedirs(ini_file_directory, exist_ok=True)
-
-                log.info(f"Opening {modName} config file...")
-                
-                keys_list = set()
-
-                for cfg in filemgr._manager.UserConfigs:
-                    data = filemgr._manager.UserConfigs[cfg]
-                    
-                    if isinstance(data, list):
-                        keys_list.update(data)
-                    else:
-                        keys_list.add(data)
-
-                for configName in keys_list:
-                    config = configparser.ConfigParser()
-                    config.optionxform = lambda option: option
-
-                    if (configName != "Keys"):
-                        configFile = os.path.join(ini_file_path, configName + ".ini")
-                    else:
-                        configFile = ini_file_path ## compatibility for old patches
-
-                    if os.path.exists(configFile):
-                        config.read(configFile, encoding="utf-8")
-
-                    log.info(f"Starting {modName} Patcher... Patching {configFile}")
-
-                    ## TOTK UC BEYOND AUTO PATCHER
-                    try:
-                        ModCreator.UCAutoPatcher(filemgr._manager, config, configName)
-                        ModCreator.UCResolutionPatcher(filemgr, filemgr._manager, config, configName)
-                        ModCreator.UCAspectRatioPatcher(filemgr._manager, config, configName)
-                    except Exception as e:
-                        log.error(f"Failed to patch {modName} config with Error : {e}")
-
-                    log.info(f"Starting {modName} Patcher has finished running...")
-
-                    ## WRITE IN CONFIG FILE FOR UC 2.0
-                    with open(configFile, "w+", encoding="utf-8") as configfile:
-                        config.write(configfile)
-
-        def Exe_Running():
-
-            if (filemgr.os_platform != "Windows"):
-                log.info("Platform is not Windows, No need to check for Executable running.")
-                return
-            
-            is_Program_Opened = LaunchManager.is_process_running(
-                NxMode.get() + ".exe"
-            )
-
-            message = (
-                f"{NxMode.get()}.exe is Running, \n"
-                f"The Optimizer Requires {NxMode.get()}.exe to be closed."
-                f"\nDo you wish to close {NxMode.get()}.exe?"
-            )
-            if is_Program_Opened is True:
-                response = messagebox.askyesno(
-                    "Warning", message, icon=messagebox.WARNING
-                )
-                if response is True:
-                    subprocess.run(
-                        ["taskkill", "/F", "/IM", f"{NxMode.get()}.exe"],
-                        check=True,
-                    )
-            if is_Program_Opened is False:
-                log.info(f"{NxMode.get()}.exe is closed, working as expected.")
-
-        def Disable_Mods():
-            ProgressBar.string.set(f"Disabling old mods...")
-            log.info("Disabling Outdated Mods...")
-
-            # Convert the lists to sets, removing any duplicates.
-            filemgr.mod_blacklist = set(filemgr.mod_blacklist)
-            filemgr.mod_whitelist = set(filemgr.mod_whitelist)
-            
-            # Run the Main code to Enable and Disable necessary Mods, the remove ensures the mods are enabled.
-            if NxMode.isLegacy():
-                
-                # read config to pass into disabled keys h
-                emuconfig = configparser.ConfigParser()
-                emuconfig.read(filemgr._emuconfig, encoding="utf-8")
-
-                for item in filemgr.mod_blacklist:
-                    modify_disabled_key(
-                        filemgr._emuconfig,
-                        filemgr.contentID,
-                        emuconfig,
-                        filemgr._manager._patchInfo.IDtoNum(),
-                        item,
-                        action="add"
-                    )
-
-                for item in filemgr.mod_whitelist:
-                    modify_disabled_key(
-                        filemgr._emuconfig,
-                        filemgr.contentID,
-                        emuconfig,
-                        filemgr._manager._patchInfo.IDtoNum(),
-                        item,
-                        action="remove"
-                    )
-
-            # fmt: off
-            if (NxMode.isRyujinx() and not filemgr.is_extracting):
-                enable_ryujinx_mods(filemgr.mod_blacklist, filemgr.mod_whitelist)
 
         ProgressBar.Run(filemgr._window, run_tasks)

@@ -36,13 +36,11 @@ class NxMode:
 
     @classmethod
     def isRyujinx(cls) -> bool:
-        if (cls.__mode == NxType.RYUJINX):
-            return True
-        
+        return cls.__mode == NxType.RYUJINX
+
     @classmethod
     def isLegacy(cls) -> bool:
-        if (cls.__mode == NxType.LEGACY):
-            return True
+        return cls.__mode == NxType.LEGACY
 
     @classmethod
     def __AUTOCHANGE(cls, old_value, new_value):
