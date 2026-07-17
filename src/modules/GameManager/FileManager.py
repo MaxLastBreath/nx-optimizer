@@ -87,6 +87,24 @@ class FileManager:
             return ryujinx_path
 
     @classmethod
+    def LegacyEmuName(filemgr) -> str:
+        """Lowercase identifier of the active Legacy fork, or empty when unknown."""
+
+        if filemgr._emuselect:
+            return filemgr._emuselect.lower()
+        if filemgr._emulist:
+            return filemgr._emulist[0].lower()
+
+        configpath = filemgr.read_configpath()
+        if configpath and configpath != "Appdata":
+            return os.path.splitext(os.path.basename(configpath))[0].lower()
+
+        if filemgr._emuglobal:
+            return os.path.basename(os.path.normpath(filemgr._emuglobal)).lower()
+
+        return ""
+
+    @classmethod
     # fmt: off
     def __LoopSearch(filemgr) -> str:
         GameID = filemgr._manager._patchInfo.ID
@@ -264,12 +282,13 @@ class FileManager:
 
         filemgr.__SelectEmulator()
 
+        GameName = filemgr._manager._patchInfo.Name
+
         if NxMode.isLegacy():
             testforuserdir = os.path.join(
                 filemgr.nand, "user", "save", "0000000000000000"
             )
             target_folder = filemgr._manager._patchInfo.ID
-            GameName = filemgr._manager._patchInfo.Name
 
             log.info(testforuserdir)
 
@@ -569,15 +588,19 @@ class FileManager:
             if (filemgr.os_platform != "Windows"):
                 log.info("Platform is not Windows, No need to check for Executable running.")
                 return
-            
-            is_Program_Opened = LaunchManager.is_process_running(
-                NxMode.get() + ".exe"
-            )
+
+            if NxMode.isLegacy():
+                emuName = filemgr.LegacyEmuName()
+                process_name = f"{emuName}.exe" if emuName else f"{NxMode.get()}.exe"
+            else:
+                process_name = "Ryujinx.exe"
+
+            is_Program_Opened = LaunchManager.is_process_running(process_name)
 
             message = (
-                f"{NxMode.get()}.exe is Running, \n"
-                f"The Optimizer Requires {NxMode.get()}.exe to be closed."
-                f"\nDo you wish to close {NxMode.get()}.exe?"
+                f"{process_name} is Running, \n"
+                f"The Optimizer Requires {process_name} to be closed."
+                f"\nDo you wish to close {process_name}?"
             )
             if is_Program_Opened is True:
                 response = messagebox.askyesno(
@@ -585,11 +608,11 @@ class FileManager:
                 )
                 if response is True:
                     subprocess.run(
-                        ["taskkill", "/F", "/IM", f"{NxMode.get()}.exe"],
+                        ["taskkill", "/F", "/IM", process_name],
                         check=True,
                     )
             if is_Program_Opened is False:
-                log.info(f"{NxMode.get()}.exe is closed, working as expected.")
+                log.info(f"{process_name} is closed, working as expected.")
 
         def Disable_Mods():
             ProgressBar.string.set(f"Disabling old mods...")

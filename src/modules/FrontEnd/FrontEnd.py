@@ -121,7 +121,7 @@ class Manager:
         )
 
     def warning(Manager, e):
-        messagebox.showwarning(f"{e}")
+        messagebox.showwarning("Warning", f"{e}")
 
     def ForceGameBG(Manager):
         # Change Name and Load Image.
@@ -716,7 +716,7 @@ class Manager:
                 ],
             )
 
-            executable_name = Legacy_path
+            executable_name = os.path.basename(Legacy_path)
 
             if executable_name.startswith("Ryujinx") or executable_name.startswith(
                 "Ryujinx.ava"

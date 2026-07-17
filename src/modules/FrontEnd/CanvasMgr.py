@@ -23,23 +23,16 @@ def next_index(event, var: ttk.Variable, list: list, increase: int = 1, command=
         command(event)
 
 
-def change_scale(event:None, var: ttk.Variable, max:float, min:float, increments: float, command=None):  # fmt: skip
+def change_scale(event:None, var: ttk.Variable, lo:float, hi:float, increments: float, command=None):  # fmt: skip
     new_value = float(var.get()) + increments
-    if new_value > float(min):
-        new_value = float(min)
+    if new_value > float(hi):
+        new_value = float(hi)
 
-    if new_value < float(max):
-        new_value = float(max)
-
-    old_value = new_value
-    round(new_value)
-    while new_value < old_value:
-        new_value += increments
-
-    log.info(f"{new_value}, {old_value}, {increments}")
+    if new_value < float(lo):
+        new_value = float(lo)
 
     var.set(str(new_value))
-    
+
     if command is not None:
         command(event)
 
@@ -326,8 +319,8 @@ class Canvas_Create:
             lambda event: change_scale(
                 event,
                 new_variable,
-                max=scale_from,
-                min=scale_to,
+                lo=scale_from,
+                hi=scale_to,
                 increments=increments,
             ),
         )
@@ -338,8 +331,8 @@ class Canvas_Create:
             lambda event: change_scale(
                 event,
                 new_variable,
-                max=scale_from,
-                min=scale_to,
+                lo=scale_from,
+                hi=scale_to,
                 increments=-increments,
             ),
         )
@@ -350,8 +343,8 @@ class Canvas_Create:
             lambda event: change_scale(
                 event,
                 new_variable,
-                max=scale_from,
-                min=scale_to,
+                lo=scale_from,
+                hi=scale_to,
                 increments=increments,
             ),
         )
@@ -362,8 +355,8 @@ class Canvas_Create:
             lambda event: change_scale(
                 event,
                 new_variable,
-                max=scale_from,
-                min=scale_to,
+                lo=scale_from,
+                hi=scale_to,
                 increments=-increments,
             ),
         )
@@ -768,7 +761,7 @@ class Canvas_Create:
             if os.path.exists(path2):
                 return path2
 
-            raise(f"COULDN'T IMAGE : {file_name}")
+            raise FileNotFoundError(f"Couldn't find image: {file_name}")
         return path
 
     @classmethod
