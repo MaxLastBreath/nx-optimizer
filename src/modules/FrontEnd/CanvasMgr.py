@@ -72,6 +72,66 @@ class Canvas_Create:
     is_Ani_Paused = False
 
     @classmethod
+    def __CreateOutlinedText(
+        cls,
+        canvas: ttk.Canvas,
+        text: str,
+        row: int,
+        cul: int,
+        tags: list,
+        tag: str = None,
+        outline_seed: str = "outline",
+        font=textfont,
+        color=textcolor,
+        anchor: str = "w",
+        justify: str = "left",
+        is_active: bool = None,
+        active_fill=None,
+    ):
+
+        tags = list(tags) if tags else []
+        active_color_new = active_fill
+
+        if tag is not None:
+            tags.append(tag)
+
+        if is_active is not None:
+            active_color_new = active_color
+            if is_active is False:
+                active_color_new = None
+            elif is_active is True:
+                tags.append("active_text")
+
+        outline_tag = [outline_seed]
+        for item in tags:
+            outline_tag.append(item)
+
+        text_outline = canvas.create_text(
+            scale(cul) + scale(1),
+            scale(row) + scale(1),
+            text=text,
+            anchor=anchor,
+            justify=justify,
+            fill=outline_color,
+            font=font,
+            tags=outline_tag,
+        )
+
+        text_line = canvas.create_text(
+            scale(cul),
+            scale(row),
+            text=text,
+            anchor=anchor,
+            justify=justify,
+            fill=color,
+            font=font,
+            tags=tags,
+            activefill=active_color_new,
+        )
+
+        return text_line, text_outline, tags, outline_tag, active_color_new
+
+    @classmethod
     def create_combobox(
         cls,
         canvas: ttk.Canvas,
@@ -80,58 +140,25 @@ class Canvas_Create:
         description_name: str = None,
         text_description: str = None,
         variable: ttk.StringVar = any,
-        values=[],
+        values=None,
         row: int = 40,
         cul: int = 40,
         drop_cul: int = 180,
         width: int = 150,
         style: str = "warning",
-        tags: list[str] = [],
+        tags: list[str] = None,
         tag: str = None,
         command: any = None,
         is_active: bool = True,
     ) -> ttk.Combobox:
 
-        tags = list(tags) if tags else []
+        values = values or []
 
-        # create text
-        active_color_new = active_color
-        if tag is not None:
-            tags.append(tag)
-        if is_active is False:
-            active_color_new = None
-        elif is_active is True:
-            tags.append("active_text")
-
-        # add outline and user-tag to the outlined text.
-        outline_tag = ["outline", tag]
-
-        for item in tags:
-            outline_tag.append(item)
-
-        # create an outline to the text.
-        canvas.create_text(
-            scale(cul) + scale(1),
-            scale(row) + scale(1),
-            text=text,
-            anchor="w",
-            fill=outline_color,
-            font=textfont,
-            tags=outline_tag,
+        text_line, _, tags, _, _ = cls.__CreateOutlinedText(
+            canvas, text, row, cul, tags, tag=tag, is_active=is_active
         )
 
-        # create the text and the variable for the dropdown.
         new_variable = ttk.StringVar(master=master, value=variable)
-        text_line = canvas.create_text(
-            scale(cul),
-            scale(row),
-            text=text,
-            anchor="w",
-            fill=textcolor,
-            font=textfont,
-            tags=tags,
-            activefil=active_color_new,
-        )
 
         # create combobox
         dropdown_variable = ttk.Combobox(
@@ -196,52 +223,17 @@ class Canvas_Create:
         width: int = 150,
         style: str = "warning",
         type: str = "s32",
-        tags: list[str] = [],
+        tags: list[str] = None,
         tag: str = None,
         command: None = None,
         is_active: bool = True,
     ) -> ttk.Variable:
 
-        tags = list(tags) if tags else []
-
-        # create text
-        active_color_new = active_color
-        if tag is not None:
-            tags.append(tag)
-        if is_active is False:
-            active_color_new = None
-        elif is_active is True:
-            tags.append("active_text")
-
-        # add outline and user-tag to the outlined text.
-        outline_tag = ["outline", tag]
-
-        for item in tags:
-            outline_tag.append(item)
-
-        # create an outline to the text.
-        canvas.create_text(
-            scale(cul) + scale(1),
-            scale(row) + scale(1),
-            text=text,
-            anchor="w",
-            fill=outline_color,
-            font=textfont,
-            tags=outline_tag,
+        text_line, _, tags, outline_tag, active_color_new = cls.__CreateOutlinedText(
+            canvas, text, row, cul, tags, tag=tag, is_active=is_active
         )
 
-        # create the text and the variable for the dropdown.
         new_variable = ttk.StringVar(master=master, value=variable)
-        text_line = canvas.create_text(
-            scale(cul),
-            scale(row),
-            text=text,
-            anchor="w",
-            fill=textcolor,
-            font=textfont,
-            tags=tags,
-            activefil=active_color_new,
-        )
 
         def custom_command():
             update_text(None, canvas, text, new_variable, type=type)
@@ -272,14 +264,6 @@ class Canvas_Create:
             tags=tags,
         )
 
-        # attempt to make a Hovertip
-        cls.read_description(
-            canvas=canvas,
-            option=description_name,
-            position_list=[scale_box, text_line],
-            master=master,
-        )
-
         tags.append(text)
         outline_tag.append(text)
 
@@ -302,7 +286,7 @@ class Canvas_Create:
             fill=textcolor,
             font=textfont,
             tags=tags,
-            activefil=active_color_new,
+            activefill=active_color_new,
         )
 
         cls.read_description(
@@ -313,53 +297,17 @@ class Canvas_Create:
             master=master,
         )
 
-        canvas.tag_bind(
-            text_line,
-            "<Button-1>",
-            lambda event: change_scale(
-                event,
-                new_variable,
-                lo=scale_from,
-                hi=scale_to,
-                increments=increments,
-            ),
-        )
-
-        canvas.tag_bind(
-            text_line,
-            "<Button-3>",
-            lambda event: change_scale(
-                event,
-                new_variable,
-                lo=scale_from,
-                hi=scale_to,
-                increments=-increments,
-            ),
-        )
-
-        canvas.tag_bind(
-            text_line_value,
-            "<Button-1>",
-            lambda event: change_scale(
-                event,
-                new_variable,
-                lo=scale_from,
-                hi=scale_to,
-                increments=increments,
-            ),
-        )
-
-        canvas.tag_bind(
-            text_line_value,
-            "<Button-3>",
-            lambda event: change_scale(
-                event,
-                new_variable,
-                lo=scale_from,
-                hi=scale_to,
-                increments=-increments,
-            ),
-        )
+        for item in (text_line, text_line_value):
+            canvas.tag_bind(
+                item,
+                "<Button-1>",
+                lambda event: change_scale(event, new_variable, lo=scale_from, hi=scale_to, increments=increments),
+            )
+            canvas.tag_bind(
+                item,
+                "<Button-3>",
+                lambda event: change_scale(event, new_variable, lo=scale_from, hi=scale_to, increments=-increments),
+            )
 
         return new_variable
 
@@ -375,54 +323,18 @@ class Canvas_Create:
         row: int = 40,
         cul: int = 40,
         drop_cul: int = 180,
-        tags: list[str] = [],
+        tags: list[str] = None,
         tag: str = None,
         command: any = None,
         is_active: bool = True,
         style: str = "success",
     ) -> ttk.StringVar:
 
-        tags = list(tags) if tags else []
-
-        # create text
-        active_color_new = active_color
-        if tag is not None:
-            tags.append(tag)
-        if is_active is False:
-            active_color_new = None
-        elif is_active is True:
-            tags.append("active_text")
-
-        # add outline and user-tag to the outlined text.
-        outline_tag = ["outline", tag]
-
-        for item in tags:
-            outline_tag.append(item)
-
-        # create an outline to the text.
-        canvas.create_text(
-            scale(cul) + scale(1),
-            scale(row) + scale(1),
-            text=text,
-            anchor="w",
-            fill=outline_color,
-            font=textfont,
-            tags=outline_tag,
+        text_line, _, tags, _, _ = cls.__CreateOutlinedText(
+            canvas, text, row, cul, tags, tag=tag, is_active=is_active
         )
 
-        # create the text and the variable for the dropdown.
         Variable = ttk.StringVar(master=master, value=variable)
-
-        text_line = canvas.create_text(
-            scale(cul),
-            scale(row),
-            text=text,
-            anchor="w",
-            fill=textcolor,
-            font=textfont,
-            tags=tags,
-            activefil=active_color_new,
-        )
 
         # create checkbutton
         try:
@@ -476,7 +388,7 @@ class Canvas_Create:
         width: int | None = None,
         padding: int | None = None,
         pos: str = "w",
-        tags: list[str] = [],
+        tags: list[str] = None,
         tag: str = None,
         style: str = "default",
         command: any = None,
@@ -531,47 +443,20 @@ class Canvas_Create:
         cul: int = 40,
         anchor: str = "w",
         justify: str = "left",
-        tags: list[str] = [],
+        tags: list[str] = None,
         tag: str = None,
         outline_tag: str = None,
         command: any = None,
     ):
 
-        tags = list(tags) if tags else []
-
-        # create text
-        if tag is not None:
-            tags.append(tag)
         if command is not None and active_fill is None:
             active_fill = active_color
 
-        outline_tag = [outline_tag]
-        for _tag in tags:
-            outline_tag.append(_tag)
-
-        # create an outline to the text.
-        text_outline = canvas.create_text(
-            scale(cul) + scale(1),
-            scale(row) + scale(1),
-            text=text,
-            anchor=anchor,
-            justify=justify,
-            fill=outline_color,
-            font=font,
-            tags=outline_tag,
-        )
-
-        # create the text and the variable.
-        text_line = canvas.create_text(
-            scale(cul),
-            scale(row),
-            text=text,
-            anchor=anchor,
-            justify=justify,
-            fill=color,
-            font=font,
-            tags=tags,
-            activefil=active_fill,
+        text_line, text_outline, tags, outline_tag, _ = cls.__CreateOutlinedText(
+            canvas, text, row, cul, tags,
+            tag=tag, outline_seed=outline_tag,
+            font=font, color=color, anchor=anchor, justify=justify,
+            active_fill=active_fill,
         )
 
         canvas.tag_bind(text_line, "<Button-1>", command)
@@ -644,11 +529,13 @@ class Canvas_Create:
         canvas: ttk.Canvas,
         option: str,
         text: str | None = None,
-        position_list=[],
+        position_list=None,
         master: ttk.Window = any,
     ):
         if f"{option}" not in description and text is None:
             return
+
+        position_list = position_list or []
 
         for position in position_list:
             try:
@@ -662,12 +549,7 @@ class Canvas_Create:
                         cls.create_tooltip(canvas, master, position, hover)
                     break
             except TclError as e:
-                if text is not None:
-                    hover = text
-                    Hovertip(position, f"{hover}", hover_delay=Hoverdelay)
-                else:
-                    hover = text
-                    Hovertip(position, f"{hover}", hover_delay=Hoverdelay)
+                Hovertip(position, f"{text}", hover_delay=Hoverdelay)
 
     @classmethod
     def create_tooltip(cls, canvas: ttk.Canvas, master: ttk.Window, position, hover):
