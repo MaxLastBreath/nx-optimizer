@@ -124,7 +124,7 @@ def loadGameConfig(Manager, config):
                 try:
                     PatchIndex = int(config.get(GameID, patch))
                     Manager.UserChoices[patch].set(dropdown_name(patch_dict, PatchIndex))
-                except KeyError:
+                except (configparser.NoOptionError, KeyError):
                     pass
                 except ValueError:
                     if config[Manager._patchInfo.ID][patch] == "auto":
