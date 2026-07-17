@@ -73,18 +73,11 @@ class FileManager:
                     "no saves have been moved!")
     
     @classmethod
-    # fmt: off
     def read_configpath(filemgr):
-        if NxMode.isLegacy():
-            config = configparser.ConfigParser()
-            config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
-            Legacy_path = config.get('Paths', 'Legacypath', fallback="Appdata")
-            return Legacy_path
-        if NxMode.isRyujinx():
-            config = configparser.ConfigParser()
-            config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
-            ryujinx_path = config.get('Paths', 'ryujinxpath', fallback="Appdata")
-            return ryujinx_path
+        key = "Legacypath" if NxMode.isLegacy() else "ryujinxpath"
+        config = configparser.ConfigParser()
+        config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
+        return config.get('Paths', key, fallback="Appdata")
 
     @classmethod
     def LegacyEmuName(filemgr) -> str:
@@ -105,32 +98,40 @@ class FileManager:
         return ""
 
     @classmethod
+    def __UserDataRoot(filemgr) -> str | None:
+        """OS-specific user data root that Legacy emulators install under."""
+
+        SpecialDir = {"Windows": "AppData/Roaming", "Linux": ".local/share"}.get(filemgr.os_platform)
+        if SpecialDir is None:
+            return None
+        return os.path.join(filemgr.home_directory, SpecialDir)
+
+    @classmethod
+    def __PortableFolder(filemgr, subfolder: str) -> str:
+        return os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), subfolder))
+
+    @classmethod
     # fmt: off
     def __LoopSearch(filemgr) -> str:
         GameID = filemgr._manager._patchInfo.ID
 
         filemgr._emulist = []
 
-        if (filemgr.os_platform == "Windows"):
-            SpecialDir = "AppData/Roaming"
-        elif filemgr.os_platform == "Linux":
-            SpecialDir = ".local/share"
-
-        userDir = os.path.join(filemgr.home_directory, SpecialDir)
+        userDir = filemgr.__UserDataRoot()
         for folder in os.listdir(userDir):
             FolderPath = os.path.join(userDir, folder)
             if os.path.exists(os.path.join(FolderPath, "load", GameID)):
                 filemgr._emulist.append(folder)
                 superlog.info(f"Found Legacy Emu folder at: {FolderPath}")
                 continue
-        
+
         if len(filemgr._emulist) < 1: # Fallback to citron
-            base_directory = os.path.join(filemgr.home_directory, SpecialDir, "citron")
+            base_directory = os.path.join(userDir, "citron")
         else:
             EmuDir = None
-            if (filemgr._emuselect is not None) : 
-                EmuDir = os.path.join(filemgr.home_directory, SpecialDir, filemgr._emuselect)
-            base_directory = EmuDir if EmuDir is not None else os.path.join(filemgr.home_directory, SpecialDir, filemgr._emulist[0])
+            if (filemgr._emuselect is not None) :
+                EmuDir = os.path.join(userDir, filemgr._emuselect)
+            base_directory = EmuDir if EmuDir is not None else os.path.join(userDir, filemgr._emulist[0])
 
         return base_directory
     
@@ -157,21 +158,25 @@ class FileManager:
         return None
         
     @classmethod
+    def __RyujinxBase(filemgr) -> str:
+        home = filemgr.home_directory
+        if filemgr.os_platform == "Windows":
+            return os.path.join(home, "AppData", "Roaming", "Ryujinx")
+        if filemgr.os_platform == "Darwin":
+            return os.path.join(home, "Library", "Application Support", "Ryujinx")
+        if filemgr.os_platform == "Linux":
+            base = os.path.join(home, ".config", "Ryujinx")
+            flatpak = os.path.join(home, ".var", "app", "org.ryujinx.Ryujinx", "config", "Ryujinx")
+            return flatpak if os.path.exists(flatpak) else base
+        return home
+
+    @classmethod
     # fmt: off
     def __PopulateRyujinx(filemgr):
         patchinfo = filemgr._manager._patchInfo
-        portablefolder = os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), "portable/"))
+        portablefolder = filemgr.__PortableFolder("portable/")
 
-        base_directory = filemgr.home_directory
-        if (filemgr.os_platform == "Windows"):
-            base_directory = os.path.join(filemgr.home_directory, "AppData", "Roaming", "Ryujinx")
-        elif filemgr.os_platform == "Darwin":
-            base_directory = os.path.join(filemgr.home_directory, "Library", "Application Support", "Ryujinx")
-        if filemgr.os_platform == "Linux":
-            base_directory = os.path.join(filemgr.home_directory, ".config", "Ryujinx")
-            flatpak = os.path.join(filemgr.home_directory, ".var", "app", "org.ryujinx.Ryujinx", "config", "Ryujinx")
-            if(os.path.exists(flatpak)):
-                base_directory = flatpak
+        base_directory = filemgr.__RyujinxBase()
         if (os.path.exists(portablefolder)):
             base_directory = portablefolder
 
@@ -186,7 +191,7 @@ class FileManager:
     @classmethod
     # fmt: off
     def __PopulateLegacy(filemgr):
-        portablefolder = os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), "user/"))
+        portablefolder = filemgr.__PortableFolder("user/")
 
         base_directory = filemgr.home_directory
         patchinfo = filemgr._manager._patchInfo
