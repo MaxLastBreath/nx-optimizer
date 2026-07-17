@@ -5,6 +5,29 @@ import os, json
 from modules.FrontEnd.FrontEndMode import NxMode
 
 # fmt: off
+def dropdown_name(patch_dict, index):
+    return patch_dict["Name_Values"][int(index)]
+
+def dropdown_index(patch_dict, name):
+    return patch_dict["Name_Values"].index(name)
+
+def apply_choice(Manager, patch_dict, option_key, value):
+    "Resolve a dropdown/scale/bool value and set it on UserChoices."
+
+    patch_class = patch_dict["Class"]
+    key = option_key.lower()
+
+    if patch_class == "dropdown":
+        Manager.UserChoices[key].set(dropdown_name(patch_dict, value))
+    elif patch_class == "scale":
+        Manager.maincanvas.itemconfig(patch_dict["Name"], text=value)
+        Manager.UserChoices[key].set(value)
+    else:
+        if patch_class == "bool":
+            if value is True: value = "On"
+            if value is False: value = "Off"
+        Manager.UserChoices[key].set(value)
+
 def apply_preset(Manager, preset_options: dict):
 
     "Apply Presets for different games"
@@ -37,38 +60,12 @@ def apply_preset(Manager, preset_options: dict):
                     patch_dict = patch_info[option_key.lower()]
                 except KeyError:
                     continue
-                patch_class = patch_dict["Class"]
-                patch_default = patch_dict["Default"]
-
-                if patch_class == "dropdown":
-                    patch_names = patch_dict["Name_Values"]
-                    Manager.UserChoices[option_key.lower()].set(patch_names[patch_default])
-                elif patch_class == "scale":
-                    Manager.maincanvas.itemconfig(patch_dict["Name"], text=patch_default)
-                    Manager.UserChoices[option_key.lower()].set(patch_default)
-                else:
-                    if patch_class == "bool":
-                        if patch_default is True: patch_default = "On"
-                        if patch_default is False: patch_default = "Off"
-                    Manager.UserChoices[option_key.lower()].set(patch_default)
+                apply_choice(Manager, patch_dict, option_key, patch_dict["Default"])
 
         for option_key, option_value in preset_options.items():
             if option_key.lower() in Manager.UserChoices:
                 patch_dict = patch_info[option_key.lower()]
-                patch_class = patch_dict["Class"]
-                patch_default = patch_dict["Default"]
-
-                if patch_class == "dropdown":
-                    patch_Names = patch_dict["Name_Values"]
-                    Manager.UserChoices[option_key.lower()].set(patch_Names[int(option_value)])
-                elif patch_class == "scale":
-                    Manager.maincanvas.itemconfig(patch_dict["Name"], text=option_value)
-                    Manager.UserChoices[option_key.lower()].set(option_value)
-                else:
-                    if patch_class == "bool":
-                        if option_value is True: option_value = "On"
-                        if option_value is False: option_value = "Off"
-                    Manager.UserChoices[option_key.lower()].set(option_value)
+                apply_choice(Manager, patch_dict, option_key, option_value)
             else:
                 continue
 
@@ -97,8 +94,7 @@ def setGameConfig(Manager, config):
                 continue
 
             if patch_class.lower() == "dropdown":
-                patch_Names = patch_dict["Name_Values"]
-                index = patch_Names.index(Manager.UserChoices[patch].get())
+                index = dropdown_index(patch_dict, Manager.UserChoices[patch].get())
                 config.set(sectionName, patch, str(index))
                 continue
 
@@ -125,19 +121,15 @@ def loadGameConfig(Manager, config):
             patch_class = patch_dict["Class"]
             patch_default = patch_dict["Default"]
             if patch_class.lower() == "dropdown":
-                patch_Names = patch_dict["Name_Values"]
                 try:
                     PatchIndex = int(config.get(GameID, patch))
-                    Manager.UserChoices[patch].set(patch_Names[PatchIndex])
+                    Manager.UserChoices[patch].set(dropdown_name(patch_dict, PatchIndex))
                 except KeyError:
                     pass
                 except ValueError:
                     if config[Manager._patchInfo.ID][patch] == "auto":
-                        PatchIndex = int(patch_default)
-                        Manager.UserChoices[patch].set(patch_Names[PatchIndex])
+                        Manager.UserChoices[patch].set(dropdown_name(patch_dict, patch_default))
                         continue
-                except (configparser.NoOptionError, KeyError):
-                    pass
                 continue
             if patch_class.lower() == "scale":
                 # use name for tag accuracy
@@ -243,17 +235,21 @@ def apply_selected_preset(manager, event=None):
         apply_preset(manager, presets[selected_preset])
 
 def write_Legacy_config(Manager, config_file: str, title_id: str, section: str, setting: str, selection):
+    write_Legacy_configs(Manager, config_file, title_id, {(section, setting): selection})
+
+def write_Legacy_configs(Manager, config_file: str, title_id: str, settings: dict):
     os.makedirs(config_file, exist_ok=True)
     Custom_Config = os.path.join(config_file, f"{title_id}.ini")
     Legacyconfig = configparser.ConfigParser()
     Legacyconfig.read(Custom_Config, encoding="utf-8")
-    if not Legacyconfig.has_section(section):
-        Legacyconfig[f"{section}"] = {}
-    Legacyconfig[f"{section}"][f"{setting}\\use_global"] = "false"
-    Legacyconfig[f"{section}"][f"{setting}\\default"] = "false"
-    Legacyconfig[f"{section}"][f"{setting}"] = selection
-    with open(Custom_Config, "w", encoding="utf-8") as config_file:
-        Legacyconfig.write(config_file, space_around_delimiters=False)
+    for (section, setting), selection in settings.items():
+        if not Legacyconfig.has_section(section):
+            Legacyconfig[f"{section}"] = {}
+        Legacyconfig[f"{section}"][f"{setting}\\use_global"] = "false"
+        Legacyconfig[f"{section}"][f"{setting}\\default"] = "false"
+        Legacyconfig[f"{section}"][f"{setting}"] = selection
+    with open(Custom_Config, "w", encoding="utf-8") as file:
+        Legacyconfig.write(file, space_around_delimiters=False)
 
 def read_ryujinx_version(config_file: str)-> int:
     with open(config_file, "r", encoding="utf-8") as file:

@@ -176,13 +176,12 @@ class ModCreator:
     def UCLegacyRamPatcher(cls, Manager, FileMgr, Layout):
         """Patches bunch of settings in Legacy Emulators, VRAM, RAM etc. Based on Resolution and shadow resolution outputs mostly."""
 
-        write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Core", "memory_layout_mode", str(Layout))  # fmt: skip
-        write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "System", "use_docked_mode", "true")  # fmt: skip
-
-        if Layout > 0:
-            write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "vram_usage_mode", "1")  # fmt: skip
-        else:
-            write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "vram_usage_mode", "0")  # fmt: skip
+        settings = {
+            ("Core", "memory_layout_mode"): str(Layout),
+            ("System", "use_docked_mode"): "true",
+            ("Renderer", "vram_usage_mode"): "1" if Layout > 0 else "0",
+        }
+        write_Legacy_configs(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, settings)
 
     @classmethod
     def UCResolutionPatcher(cls, FileMgr, Manager, Config, Name):
@@ -231,7 +230,7 @@ class ModCreator:
             if "eden" in emuName or ("citron" in emuName and "neo" in emuName):
                 new_scale += 1
 
-            write_Legacy_config(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, "Renderer", "resolution_setup", f"{new_scale}")  # fmt: skip
+            write_Legacy_configs(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, {("Renderer", "resolution_setup"): f"{new_scale}"})  # fmt: skip
             cls.UCLegacyRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
 
         if NxMode.isRyujinx():
