@@ -24,6 +24,24 @@ def increase_row(row, cul_sel, cul_tex):
     return row, cul_sel, cul_tex
 
 
+class LayoutCursor:
+
+    def __init__(self, row, cul, drop_cul, row2, cul2, drop_cul2, bool_col=0):
+        self.row = row
+        self.cul = cul
+        self.drop_cul = drop_cul
+        self.row2 = row2
+        self.cul2 = cul2
+        self.drop_cul2 = drop_cul2
+        self.bool_col = bool_col
+
+    def NextRow(self):
+        self.row, self.cul, self.drop_cul = increase_row(self.row, self.cul, self.drop_cul)
+
+    def NextBoolRow(self):
+        self.row2, self.cul2, self.drop_cul2 = increase_row(self.row2, self.cul2, self.drop_cul2)
+
+
 class Manager:
 
     _patchInfo: PatchInfo = None
@@ -103,7 +121,6 @@ class Manager:
         Manager.cheat_version = ttk.StringVar(value="Version - 1.2.1")
 
         # Load Canvas
-        # Load_ImagePath(Manager)
         Manager.Create_Canvases()
 
         # Load NX-Mode, CheckPaths and Print User OS.
@@ -204,8 +221,8 @@ class Manager:
                 patch_description = dicts.get("Description")
                 patch_default_index = dicts.get("Default")
                 
-                try : 
-                    pos = pos_dict[section_auto]
+                try :
+                    cursor = pos_dict[section_auto]
                 except Exception as e :
                     log.warning(f"Section Not Implemented Yet {section_auto}")
                     continue
@@ -223,19 +240,16 @@ class Manager:
                         text=patch_name,
                         values=patch_list,
                         variable=patch_list[patch_default_index],
-                        row=pos[0],
-                        cul=pos[1],
-                        drop_cul=pos[2],
+                        row=cursor.row,
+                        cul=cursor.cul,
+                        drop_cul=cursor.drop_cul,
                         width=100,
                         tags=["dropdown", "patchinfo", "scrollable"],
                         tag=section_auto,
                         text_description=patch_description,
                         command=(lambda e: Manager.UpdateEmuScale(canvas, Manager._EmulatorScale, ResolutionScaleName)) if name == "resolution" else None
                     )
-                    new_pos = increase_row(pos[0], pos[1], pos[2])
-                    pos[0] = new_pos[0]
-                    pos[1] = new_pos[1]
-                    pos[2] = new_pos[2]
+                    cursor.NextRow()
 
                 if dicts["Class"].lower() == "scale":
 
@@ -248,9 +262,9 @@ class Manager:
                         scale_from=patch_values[0],
                         scale_to=patch_values[1],
                         type=patch_type,
-                        row=pos[0],
-                        cul=pos[1],
-                        drop_cul=pos[2],
+                        row=cursor.row,
+                        cul=cursor.cul,
+                        drop_cul=cursor.drop_cul,
                         width=100,
                         increments=float(patch_increments),
                         tags=["scale", "patchinfo", "scrollable"],
@@ -258,48 +272,40 @@ class Manager:
                         text_description=patch_description,
                     )
                     if patch_type == "f32":
-                        print(f"{patch_name} - {patch_default_index}")
+                        log.info(f"{patch_name} - {patch_default_index}")
                         patch_var.set(float(patch_default_index))
                     else:
                         patch_var.set(patch_default_index)
 
                     canvas.itemconfig(patch_name, text=f"{float(patch_default_index)}")
-                    new_pos = increase_row(pos[0], pos[1], pos[2])
-                    pos[0] = new_pos[0]
-                    pos[1] = new_pos[1]
-                    pos[2] = new_pos[2]
+                    cursor.NextRow()
 
                 if dicts["Class"].lower() == "bool":
                     bool_col_stride = 180
-                    bool_col_idx = pos[6]
                     patch_var = Canvas_Create.create_checkbutton(
                         master=Manager._window,
                         canvas=canvas,
                         text=patch_name,
                         variable="Off",
-                        row=pos[3],
-                        cul=pos[4] + bool_col_idx * bool_col_stride,
-                        drop_cul=pos[5] + bool_col_idx * bool_col_stride,
+                        row=cursor.row2,
+                        cul=cursor.cul2 + cursor.bool_col * bool_col_stride,
+                        drop_cul=cursor.drop_cul2 + cursor.bool_col * bool_col_stride,
                         tags=["bool", "patchinfo", "scrollable"],
                         tag=section_auto,
                         text_description=patch_description,
                     )
                     if patch_default_index:
                         patch_var.set("On")
-                    bool_col_idx += 1
-                    if bool_col_idx >= 2:
-                        bool_col_idx = 0
-                        new_pos = increase_row(pos[3], pos[4], pos[5])
-                        pos[3] = new_pos[0]
-                        pos[4] = new_pos[1]
-                        pos[5] = new_pos[2]
-                    pos[6] = bool_col_idx
+                    cursor.bool_col += 1
+                    if cursor.bool_col >= 2:
+                        cursor.bool_col = 0
+                        cursor.NextBoolRow()
 
                 if patch_var is None:
                     continue
                 Manager.UserChoices[name] = patch_var
 
-            pos = pos_dict["main"]
+            cursor = pos_dict["main"]
 
             if (Manager._patchInfo.ResolutionScale is True):
                 Manager._EmulatorScale = Canvas_Create.create_scale(
@@ -309,9 +315,9 @@ class Manager:
                     scale_from=int(1),
                     scale_to=int(4),
                     type="s32",
-                    row=pos[0],
-                    cul=pos[1],
-                    drop_cul=pos[2],
+                    row=cursor.row,
+                    cul=cursor.cul,
+                    drop_cul=cursor.drop_cul,
                     width=100,
                     increments=int(1),
                     tags=["scale", "patchinfo", "scrollable"],
@@ -323,7 +329,7 @@ class Manager:
 
         if hasattr(canvas, "set_content_height"):
             max_row = max(
-                max(v[0], v[3]) for v in pos_dict.values()
+                max(v.row, v.row2) for v in pos_dict.values()
             )
             canvas.update_idletasks()
             canvas.set_content_height(scale(max_row + 60))
@@ -392,28 +398,6 @@ class Manager:
         cul_sel_2 = 550
 
         Manager.CreatePresets()
-
-        # FOR DEBUGGING PURPOSES
-        def onCanvasClick(event):
-            print(f"CRODS = X={event.x} + Y={event.y} + {event.widget}")
-
-        Manager.maincanvas.bind("<Button-3>", onCanvasClick)
-        # Start of CANVAS options.
-
-        # Setting Preset - returns variable.
-
-        # value = ["No Change"]
-        # for item in Manager.Legacy_settings:
-        #     value.append(item)
-
-        # Manager.selected_settings = Canvas_Create.create_combobox(
-        #                                                     master=Manager._window, canvas=canvas,
-        #                                                     text="Legacy SETTINGS:",
-        #                                                     variable=value[0], values=value,
-        #                                                     row=row, cul=340, drop_cul=480,
-        #                                                     tags=["text"], tag="Legacy",
-        #                                                     description_name="Settings"
-        #                                                 )
 
         value = []
         for item in Manager.patches:
@@ -581,16 +565,16 @@ class Manager:
         ##              REMOVED DFPS, SINCE ULTRACAM BEYOND DOES IT ALL AND SO MUCH BETTER.
 
         pos_dict = {
-            "main": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2, 0],
-            "extra": [row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2, 0],
+            "main": LayoutCursor(row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2),
+            "extra": LayoutCursor(row, cul_tex, cul_sel, row_2, cul_tex_2, cul_sel_2),
         }
 
         Manager.Back_Pos = copy.deepcopy(pos_dict)
 
         Manager.LoadPatches(canvas, pos_dict)
 
-        row = pos_dict["main"][0]
-        row_2 = pos_dict["main"][3]
+        row = pos_dict["main"].row
+        row_2 = pos_dict["main"].row2
 
         Manager.ModeType = Canvas_Create.image_Button(
             canvas=canvas,
@@ -768,16 +752,11 @@ class Manager:
                 button.ToggleImg(WidgetState.Enter)
 
     def open_browser(Manager, web, event=None):
-        url = "https://www.nxoptimizer.com/"
-        if web == "Kofi":
-            url = "https://www.nxoptimizer.com/ko-fi/"
-        elif web == "Github":
-            url = "https://www.nxoptimizer.com/"
-        elif web == "Discord":
-            url = "https://www.nxoptimizer.com/discord/"
-        elif web == "Web":
-            url = "https://www.nxoptimizer.com/"
-        webbrowser.open(url)
+        urls = {
+            "Kofi": "https://www.nxoptimizer.com/ko-fi/",
+            "Discord": "https://www.nxoptimizer.com/discord/",
+        }
+        webbrowser.open(urls.get(web, "https://www.nxoptimizer.com/"))
 
     def extract_patches(Manager):
         FileManager.is_extracting = True
