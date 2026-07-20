@@ -86,7 +86,7 @@ class Manager:
         Game_Manager.LoadPatches()
         FileManager.Initialize(window, Manager)
         TextureMgr.Initialize()  # load all images.
-        AnimationQueue.Initialize()
+        AnimationQueue.Initialize(window)
         Manager.patches = Game_Manager.GetPatches()
         
         # Emulator Scaling

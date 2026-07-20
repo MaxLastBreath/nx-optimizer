@@ -16,7 +16,6 @@ import time
 
 from run_config import __ROOT__
 
-
 class FileManager:
 
     _window: ttk.Window = None
@@ -244,7 +243,7 @@ class FileManager:
             os.makedirs(destination, exist_ok=True)
             shutil.copytree(source, destination, dirs_exist_ok=True)
         else:
-            destination = os.path.join(os.getcwd(), "Extracted Files", patchinfo.ModName)
+            destination = os.path.join(__ROOT__, "Extracted Files", patchinfo.ModName)
             os.makedirs(destination, exist_ok=True)
             shutil.copytree(source, destination, dirs_exist_ok=True)
 
@@ -370,7 +369,7 @@ class FileManager:
         SdCard = filemgr.sdmc
 
         if filemgr.is_extracting is True:
-            Folder = os.path.join(os.getcwd(), "Extracted Files")
+            Folder = os.path.join(__ROOT__, "Extracted Files")
             os.makedirs(Folder, exist_ok=True)
             return os.path.join(Folder, PatchInfo.ModName, PatchInfo.ConfigPath)
         if PatchInfo.isSDconfig is True:
