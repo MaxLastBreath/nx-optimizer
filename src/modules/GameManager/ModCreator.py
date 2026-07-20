@@ -54,6 +54,9 @@ class ResolutionVector:
 
 class ModCreator:
 
+    RESOLUTION_KEYS = ["resolution", "docked", "handheld"]
+    SHADOW_KEYS = ["shadow resolution", "shadows"]
+
     @classmethod
     def CreateCheats(cls):
         """This function creates a cheat manager patcher, primarily used only for TOTK right now."""
@@ -184,6 +187,55 @@ class ModCreator:
         write_Legacy_configs(Manager, FileMgr._gameconfig, Manager._patchInfo.ID, settings)
 
     @classmethod
+    def GetOptionValue(cls, Manager, patch_dict, option):
+        """Resolves a dropdown option to its Value, falling back to the option's Default."""
+
+        Values = patch_dict["Values"]
+        Choice = Manager.UserChoices.get(option)
+
+        if Choice is None:
+            return Values[patch_dict["Default"]]
+
+        try:
+            return Values[patch_dict["Name_Values"].index(Choice.get())]
+        except ValueError:
+            return Values[patch_dict["Default"]]
+
+    @classmethod
+    def GetResolutionVector(cls, Manager, patch_info):
+        """
+        Builds the resolution vector driving RAM layout and emulator settings.
+        Handles the old single "resolution" option and UltraCam's docked/handheld pair,
+        taking whichever resolution renders the most pixels.
+        """
+
+        Resolutions = []
+
+        for option in cls.RESOLUTION_KEYS:
+            if option not in patch_info:
+                continue
+
+            Value = str(cls.GetOptionValue(Manager, patch_info[option], option))
+            Numbers = re.findall(r"\d+(?:\.\d+)?", Value)
+
+            if len(Numbers) < 2:
+                continue
+
+            Resolutions.append(ResolutionVector(Numbers[0], Numbers[1]))
+
+        if not Resolutions:
+            return None
+
+        Resolution = max(Resolutions, key=lambda res: res.getscale())
+
+        for option in cls.SHADOW_KEYS:
+            if option in patch_info:
+                Resolution.addShadows(cls.GetOptionValue(Manager, patch_info[option], option))
+                break
+
+        return Resolution
+
+    @classmethod
     def UCResolutionPatcher(cls, FileMgr, Manager, Config, Name):
         """
         This function configues the mod's config file (.ini) dynamically based on games.
@@ -201,22 +253,9 @@ class ModCreator:
         if patch_info is None:
             return
 
-        try:
-            resolution = Manager.UserChoices["resolution"].get()
-        except Exception:
-            resolution = patch_info["resolution"]["Name_Values"][patch_info["resolution"]["Default"]]
-
-        if "shadows" in patch_info:
-            shadows = int(Manager.UserChoices["shadow resolution"].get().split("x")[0])
-        else:
-            shadows = 1024
-
-        ResInfo = patch_info["resolution"]["Values"][
-            patch_info["resolution"]["Name_Values"].index(resolution)
-        ].split("x")
-
-        Resolution = ResolutionVector(ResInfo[0], ResInfo[1])
-        Resolution.addShadows(shadows)
+        Resolution = cls.GetResolutionVector(Manager, patch_info)
+        if Resolution is None:
+            return
 
         if NxMode.isLegacy():
             # for emulator scale
@@ -240,6 +279,9 @@ class ModCreator:
 
             write_ryujinx_config(FileMgr, FileMgr._emuconfig, "res_scale", new_scale)  # fmt: skip
             cls.UCRyujinxRamPatcher(Manager, FileMgr, Resolution.getRamLayout())
+
+        if "resolution" not in patch_info:
+            return
 
         Section = patch_info["resolution"]["Config_Class"][0]
         Width = patch_info["resolution"]["Config_Class"][1]

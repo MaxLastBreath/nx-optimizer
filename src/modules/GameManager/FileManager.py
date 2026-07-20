@@ -484,9 +484,6 @@ class FileManager:
 
             log.warning(f"Creating {modName} config File Path... {ini_file_path}\n")
 
-            ini_file_directory = os.path.dirname(ini_file_path)
-            os.makedirs(ini_file_directory, exist_ok=True)
-
             log.info(f"Opening {modName} config file...")
 
             keys_list = set()
@@ -507,6 +504,8 @@ class FileManager:
                     configFile = os.path.join(ini_file_path, configName + ".ini")
                 else:
                     configFile = ini_file_path ## compatibility for old patches
+
+                os.makedirs(os.path.dirname(configFile), exist_ok=True)
 
                 if os.path.exists(configFile):
                     config.read(configFile, encoding="utf-8")
