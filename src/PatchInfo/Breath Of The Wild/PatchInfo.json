@@ -12,5 +12,25 @@
     "benchmarks_file" : "BOTWBenchmark.txt",
     "EmulationScale" : true,
     "Cheats" : true,
-    "SD" : false
+    "SD" : false,
+    "Variants": [
+        {
+            "Name": "BOTW 1.9.0 - FPS + Graphics (Experimental)",
+            "SelectionID": "01007EF00011E000@1.9.0-native",
+            "SelectionAliases": ["01007EF00011E000@1.9.0-fps"],
+            "Versions": ["1.9.0"],
+            "Mod_Version": "0.2.3-experimental",
+            "ModName": "!!!BOTW 1.9.0 Optimizer",
+            "ModFolder": "NativeFPS",
+            "ModConfig": "",
+            "Config": "Options-Native-1.9.json",
+            "Presets": "Presets-Native-1.9.json",
+            "ExefsPatch": "FPS-1.9.json",
+            "NativePayload": "NativeFPS-1.9.json",
+            "ConflictingMods": ["!!!BOTW Optimizer", "!!!BOTW 1.9.0 60 FPS"],
+            "benchmarks": false,
+            "EmulationScale": false,
+            "Cheats": false
+        }
+    ]
 }

@@ -47,7 +47,7 @@
 ### **📃Supported Games - Full Game Information 📃**
 - [Tears Of The Kingdom](https://www.nxoptimizer.com/games/tears-of-the-kingdom) Versions - 1.0.0 (PARTIAL), 1.1.0, 1.1.1, 1.1.2, 1.2.0, 1.2.1, 1.4.0 (PARTIAL), 1.4.1 (PARTIAL), 1.4.2
 - [Echoes Of Wisdom](https://www.nxoptimizer.com/games/echoes-of-wisdom) Versions - 1.0.1, 1.0.2
-- [Breath Of The Wild](https://www.nxoptimizer.com/games/breath-of-the-wild) Versions - 1.6
+- [Breath Of The Wild](https://www.nxoptimizer.com/games/breath-of-the-wild) Versions - 1.6 (UltraCam), [1.9.0 experimental configurable FPS and graphics](docs/BOTW-1.9.md)
 - [Pokemon Scarlet/Violet](https://www.nxoptimizer.com/games/pokemon-scarlet-violet) Versions - Latest
 - [Xenoblade Chronicles X](https://www.nxoptimizer.com/games/xenoblade-chronicles-x) Versions - 1.0.1, 1.0.2
 

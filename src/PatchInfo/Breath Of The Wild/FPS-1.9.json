@@ -1,0 +1,36 @@
+{
+    "game": "The Legend of Zelda: Breath of the Wild",
+    "version": "1.9.0",
+    "title_id": "01007EF00011E000",
+    "build_id": "CD57B23FA4BBAD65803D9788C01821EE00000000000000000000000000000000",
+    "main_sha256": "f6f0b20bb1f2b67d164c24871cd473147eef1d285f12e7bd492e3126c6022e27",
+    "mod_name": "!!!BOTW 1.9.0 60 FPS",
+    "status": "experimental - IPSwitch export confirmed at 60 FPS by user in Eden nightly 5f142c7926; broader gameplay testing pending",
+    "fps": 60,
+    "patches": [
+        {
+            "offset": "0x011269CC",
+            "expected": "F303012A",
+            "replacement": "21008052",
+            "description": "Framework setInterval: pass interval 1 to native frame timer (mov w1, #1)."
+        },
+        {
+            "offset": "0x011269D8",
+            "expected": "E103132A",
+            "replacement": "21008052",
+            "description": "Framework setInterval: pass interval 1 to presentation wrapper (mov w1, #1)."
+        },
+        {
+            "offset": "0x011269FC",
+            "expected": "F303012A",
+            "replacement": "21008052",
+            "description": "Secondary interface: pass interval 1 to native frame timer (mov w1, #1)."
+        },
+        {
+            "offset": "0x01126A08",
+            "expected": "E103132A",
+            "replacement": "21008052",
+            "description": "Secondary interface: pass interval 1 to presentation wrapper (mov w1, #1)."
+        }
+    ]
+}

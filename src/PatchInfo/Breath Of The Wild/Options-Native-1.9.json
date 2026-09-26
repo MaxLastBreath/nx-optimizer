@@ -1,0 +1,47 @@
+{
+    "NativeFPS": {
+        "fps": {
+            "Name": "FPS limit",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [20, 120],
+            "Type": "s32",
+            "Default": 60,
+            "Increments": 1,
+            "Description": "Experimental clock-based FPS limit. Supports values such as 45 FPS. Native simulation time uses measured frame duration, including slower frames. Keep emulator speed at 100%."
+        },
+        "fov": {
+            "Name": "World camera FOV",
+            "Class": "scale",
+            "Section": "main",
+            "Auto": false,
+            "Values": [20, 120],
+            "Type": "s32",
+            "Default": 50,
+            "Increments": 1,
+            "Description": "50 leaves the original camera unchanged. Other values scale the world camera's freshly calculated FOV relative to 50, keeping relative aiming/cutscene zoom. Resulting angles are clamped to 5-120 degrees."
+        },
+        "render distance": {
+            "Name": "Render Distance",
+            "Class": "dropdown",
+            "Section": "main",
+            "Auto": false,
+            "Name_Values": ["VERY LOW", "LOW", "MEDIUM", "DEFAULT", "(EXPERIMENTAL) HAS ISSUES"],
+            "Values": [1000, 5000, 12500, 25000, 35000],
+            "Default": 3,
+            "LegacyNumericOption": "far clip",
+            "Description": "Original BOTW Render Distance presets: VERY LOW 1000, LOW 5000, MEDIUM 12500, DEFAULT 25000, experimental 35000. Controls the world camera's far clipping plane, not object streaming or LOD. DEFAULT preserves the original game's handling."
+        },
+        "emulator scale": {
+            "Name": "Resolution Scale",
+            "Class": "dropdown",
+            "Section": "main",
+            "Auto": false,
+            "Name_Values": ["Keep current", "1x", "2x", "3x", "4x"],
+            "Values": [0, 1, 2, 3, 4],
+            "Default": 1,
+            "Description": "Emulator resolution scaling, applied by Apply. Default is 1x, as in the original BOTW 1.6 profile. Keep current preserves your setting. Extract does not change emulator configuration. This does not change the game's native framebuffer resolution or its dynamic resolution logic."
+        }
+    }
+}

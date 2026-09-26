@@ -1,0 +1,25 @@
+{
+    "source_sha256": "cd5dda16ed2ee1970e6bb95f1e6b73d4d1bd1db923180a53152de068f2bc6bf7",
+    "blocks": [
+        {
+            "name": "limiter",
+            "offset": "0x015A1C80",
+            "replacement": "FD7BBDA9FD030091F35301A9F55B02A9934000B073820791E2FBFF97F40300AA08190018950AC89A96F8FF97760240F9360100B4090016CB3F0115EBE2000054A00209CB53FBFF974EFBFF978DF8FF97F9FFFF17E90315AA600200F92001239E8102239E0018211E01D0271E0008211E0110211E0058211E600A00BDF55B42A9F35341A9FD7BC3A8C0035FD6"
+        },
+        {
+            "name": "fov",
+            "offset": "0x015A1E80",
+            "replacement": "300A001C0008301E500A001C0058301EF009001C0048301E007500BDC0035FD6"
+        },
+        {
+            "name": "far_clip",
+            "offset": "0x015A1EC0",
+            "replacement": "4008001C007100BDC0035FD6"
+        },
+        {
+            "name": "delta",
+            "offset": "0x015A1E00",
+            "replacement": "904000B001EA41BD2820201EAC000054900D00180102231E10D0271E011A211E613200BD2020201EC0035FD6"
+        }
+    ]
+}

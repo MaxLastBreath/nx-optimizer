@@ -5,6 +5,9 @@ from modules.FrontEnd.ProgressBar import ProgressBar
 from modules.GameManager.LaunchManager import LaunchManager
 from modules.GameManager.ModCreator import ModCreator
 from modules.GameManager.DragFile import DragFile
+from modules.GameManager.ExefsPatch import load_patch, export_patch
+from modules.GameManager.BotwNativePatch import build_patch as build_botw_native_patch
+from modules.GameManager.BotwNativePatch import emulator_graphics
 from modules.TOTK_Optimizer_Modules import *
 from configuration.settings import *
 from tkinter import messagebox
@@ -473,6 +476,38 @@ class FileManager:
             return
 
         elif mode == None:
+            if patchInfo.ExefsPatch:
+                patch = load_patch(os.path.join(patchInfo.Folder, patchInfo.ExefsPatch))
+                settings = {}
+                if patchInfo.NativePayload:
+                    choices = filemgr._manager.UserChoices
+                    distance_option = filemgr._manager.UltracamPatchJson["NativeFPS"]["render distance"]
+                    distance_index = distance_option["Name_Values"].index(choices["render distance"].get())
+                    patch = build_botw_native_patch(
+                        patch, os.path.join(patchInfo.Folder, patchInfo.NativePayload),
+                        fps=int(choices["fps"].get()), far_clip=distance_option["Values"][distance_index],
+                        fov=int(choices["fov"].get()),
+                    )
+                    graphics = {"emulator scale": choices["emulator scale"].get()}
+                    emulator = filemgr.LegacyEmuName() if NxMode.isLegacy() else "ryujinx"
+                    settings = emulator_graphics(emulator, scale=graphics["emulator scale"])
+                    patch["emulator_settings"] = graphics
+                root = os.path.join(os.getcwd(), "Extracted Files") if filemgr.is_extracting else modDir
+                destination = os.path.join(root, modName)
+                patch_format = "pchtxt" if NxMode.isLegacy() else "ips"
+                output = export_patch(patch, destination, patch_format)
+                if not filemgr.is_extracting and settings:
+                    if NxMode.isLegacy():
+                        write_Legacy_configs(filemgr._manager, filemgr._gameconfig, patchInfo.ID,
+                                             {("Renderer", key): value for key, value in settings.items()})
+                    else:
+                        for key, value in settings.items():
+                            write_ryujinx_config(filemgr, filemgr._emuconfig, key, value)
+                filemgr.mod_whitelist.append(modName)
+                filemgr.mod_blacklist.extend(patchInfo.ConflictingMods)
+                log.info(f"Created experimental Build-ID-scoped patch: {output}")
+                return
+
             log.info(f"Generating mod at {modDir}")
             os.makedirs(modDir, exist_ok=True)
 
@@ -651,7 +686,18 @@ class FileManager:
                     filemgr.Copyright,
                 ]
 
-                if get_setting("auto-backup") in ["On"]:
+                if filemgr._manager._patchInfo.ExefsPatch:
+                    # ExeFS profiles do not install UltraCam or write its INI. Export
+                    # must also work without changing a running emulator's setup.
+                    tasklist = [filemgr.__CreateModPatch]
+                    if not filemgr.is_extracting:
+                        tasklist.insert(0, filemgr.__CheckExeRunning)
+                        tasklist.append(filemgr.__DisableMods)
+                    tasklist.append(stop_extracting)
+
+                if get_setting("auto-backup") in ["On"] and not (
+                    filemgr._manager._patchInfo.ExefsPatch and filemgr.is_extracting
+                ):
                     tasklist.append(filemgr.backup)
 
                 run_tasklists(tasklist)

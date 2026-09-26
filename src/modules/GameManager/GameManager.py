@@ -39,20 +39,17 @@ class Game_Manager:
                 with open(filepath, "r", encoding="utf-8") as file:
                     jsonfile = json.load(file)
 
-                # check if a game already exists inside of our loop
-                for item in cls.GamePatches:
-                    if item.Name == jsonfile['Name']:
-                        return item
-
-                log.info(
-                    f"{jsonfile['Name']} [{jsonfile['ID']}] : {jsonfile['Versions']}"
-                )
-
-                _PatchInfo: PatchInfo = PatchInfo(patchfolder, jsonfile)
-
-                cls.GamePatches.append(
-                    _PatchInfo
-                )
+                # Variants share a title ID and artwork, but have distinct options
+                # and saved selections (e.g. UltraCam 1.6 vs native FPS 1.9).
+                definitions = [jsonfile] + [jsonfile | variant for variant in jsonfile.get("Variants", [])]
+                for definition in definitions:
+                    item = next((p for p in cls.GamePatches if p.Name == definition['Name']), None)
+                    if item is None:
+                        log.info(f"{definition['Name']} [{definition['ID']}] : {definition['Versions']}")
+                        item = PatchInfo(patchfolder, definition)
+                        cls.GamePatches.append(item)
+                    if _PatchInfo is None:
+                        _PatchInfo = item
                 return _PatchInfo
 
     @classmethod
@@ -65,10 +62,16 @@ class Game_Manager:
 
     @classmethod
     def GetJsonByID(cls, ID: str) -> PatchInfo:
-        """Finds the current json file for a TITLEID."""
+        """Find a saved selection, accepting legacy title IDs for base profiles."""
 
         for item in cls.GamePatches:
-            if ID.lower() == item.ID.lower():
+            if ID.lower() == item.SelectionID.lower():
+                return item
+
+        # Retired selections resolve to the current profile, without importing
+        # their old option encoding (e.g. FPS dropdown index 0 is not 0 FPS).
+        for item in cls.GamePatches:
+            if any(ID.lower() == alias.lower() for alias in item.SelectionAliases):
                 return item
 
         # if we don't find anything return TOTK patch.

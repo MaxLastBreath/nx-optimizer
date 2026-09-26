@@ -1,5 +1,5 @@
 from modules.logger import log, superlog
-import json, os
+import json, math, os
 
 
 class PatchInfo:
@@ -22,6 +22,8 @@ class PatchInfo:
     def __init__(self, folder: str, JsonFile: json):  # fmt: skip
         self.Folder = folder
         self.ID = self.Json(JsonFile, "ID") # mandatory
+        self.SelectionID = JsonFile.get("SelectionID", self.ID)
+        self.SelectionAliases = JsonFile.get("SelectionAliases", [])
         self.Name = self.Json(JsonFile, "Name") # mandatory
         self.Versions = self.Json(JsonFile, "Versions", [])
         self.ModName = self.Json(JsonFile, "ModName", "!!!NX-Optimizer")
@@ -31,6 +33,11 @@ class PatchInfo:
         self.isSDconfig = self.Json(JsonFile, "SD", False)
         self.ResolutionScale = self.Json(JsonFile, "EmulationScale", True)
         self.ModVersion = self.Json(JsonFile, "Mod_Version", "1.0")
+        self.OptionsFile = JsonFile.get("Config", "Options.json")
+        self.PresetsFile = JsonFile.get("Presets", "Presets.json")
+        self.ExefsPatch = JsonFile.get("ExefsPatch")
+        self.NativePayload = JsonFile.get("NativePayload")
+        self.ConflictingMods = JsonFile.get("ConflictingMods", [])
 
         self.Support_Benchmark = self.Json(JsonFile, "benchmarks", False)
         self.Benchmark_Version = self.Json(JsonFile, "benchmarks_version", 0)
@@ -52,18 +59,39 @@ class PatchInfo:
         return int(self.ID, 16)
 
     def LoadJson(self):
-        Location = os.path.join(self.Folder, "Options.json")
+        Location = os.path.join(self.Folder, self.OptionsFile)
         with open(Location, "r", encoding="utf-8") as file:
             return json.load(file)
 
     def LoadPresetsJson(self):
-        Location = os.path.join(self.Folder, "Presets.json")
+        Location = os.path.join(self.Folder, self.PresetsFile)
 
         if not os.path.exists(Location):
             return {"Saved": {}}
 
         with open(Location, "r", encoding="utf-8") as file:
             return {"Saved": {}} | json.load(file)
+
+    def MigrateUserConfig(self, config, options):
+        """Map retired numeric settings to the closest preset, in memory only."""
+        section = self.SelectionID
+        if not config.has_section(section):
+            return
+        for group in options.values():
+            for name, option in group.items():
+                legacy = option.get("LegacyNumericOption")
+                if not legacy or config.has_option(section, name) or not config.has_option(section, legacy):
+                    continue
+                try:
+                    value = config.getfloat(section, legacy)
+                    if not math.isfinite(value):
+                        raise ValueError("Non-finite legacy setting")
+                    values = option["Values"]
+                    index = min(range(len(values)), key=lambda i: abs(values[i] - value))
+                except ValueError:
+                    index = option["Default"]
+                config.set(section, name, str(index))
+                log.info(f"Migrated {legacy} to {name}: {option['Name_Values'][index]}")
 
     def LoadCheatsJson(self):
         if self.Cheats is False:

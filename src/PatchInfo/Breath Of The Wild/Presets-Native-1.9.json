@@ -1,0 +1,7 @@
+{
+    "Default": {},
+    "45 FPS": {"fps": 45, "render distance": 3},
+    "60 FPS": {"fps": 60, "render distance": 3},
+    "90 FPS": {"fps": 90, "render distance": 3},
+    "120 FPS": {"fps": 120, "render distance": 3}
+}

@@ -51,7 +51,7 @@ def find_title_id_index(config, config_title_id):
         return None
     else:
         for key, value in config.items(section):
-            if value == config_title_id:
+            if value == str(config_title_id):
                 TitleIndexnum = key.split("\\")[0]
                 return TitleIndexnum
     return None

@@ -73,7 +73,7 @@ def setGameConfig(Manager, config):
     # UltraCam Beyond new patches.
     for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
         patch_info = value
-        sectionName = Manager._patchInfo.ID
+        sectionName = Manager._patchInfo.SelectionID
 
         if not config.has_section(sectionName):
             config.add_section(sectionName)
@@ -104,7 +104,7 @@ def loadGameConfig(Manager, config):
     # Load UltraCam Beyond new patches.
     for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
         patch_info = value
-        GameID = Manager._patchInfo.ID
+        GameID = Manager._patchInfo.SelectionID
 
         for itemName in value:
             Manager.UserConfigs[itemName] = key
@@ -127,7 +127,7 @@ def loadGameConfig(Manager, config):
                 except (configparser.NoOptionError, KeyError):
                     pass
                 except ValueError:
-                    if config[Manager._patchInfo.ID][patch] == "auto":
+                    if config[GameID][patch] == "auto":
                         Manager.UserChoices[patch].set(dropdown_name(patch_dict, patch_default))
                         continue
                 continue
@@ -186,7 +186,7 @@ def save_user_choices(Manager, config_file, Legacy_path=None):
              "Attempting to write into file.")
     
     if (Manager._patchInfo.ResolutionScale):
-        config.set(Manager._patchInfo.ID, "emuscale", Manager._EmulatorScale.get())
+        config.set(Manager._patchInfo.SelectionID, "emuscale", Manager._EmulatorScale.get())
     
     # Write the updated configuration back to the file
     with open(config_file, 'w', encoding="utf-8") as file:
@@ -197,6 +197,7 @@ def load_user_choices(Manager, config_file, mode=None):
     config = configparser.ConfigParser()
     config.read(config_file, encoding="utf-8")
 
+    Manager._patchInfo.MigrateUserConfig(config, Manager.UltracamPatchJson)
     loadGameConfig(Manager, config)
 
     # Load the enable/disable choices
@@ -328,7 +329,7 @@ def load_config_game(Manager, config_file):
         config["Options"] = {}
         return "0"
     
-    return config.get("Options", "Game", fallback=Manager._patchInfo.ID)
+    return config.get("Options", "Game", fallback=Manager._patchInfo.SelectionID)
 
 def save_config_game(Manager, config_file):
     ''' Saves the current selected Configuration game. '''
@@ -336,7 +337,7 @@ def save_config_game(Manager, config_file):
     config.read(config_file, encoding="utf-8")
     if not config.has_section("Options"):
         config["Options"] = {}
-    config.set("Options", "Game", Manager._patchInfo.ID)
+    config.set("Options", "Game", Manager._patchInfo.SelectionID)
 
     with open(config_file, 'w', encoding="utf-8") as file:
         config.write(file)
