@@ -14,7 +14,7 @@ import subprocess
 import shutil
 import time
 
-from run_config import __ROOT__
+from run_config import __LOCAL__
 
 
 class FileManager:
@@ -311,7 +311,7 @@ class FileManager:
         elif NxMode.isRyujinx():
             folder_to_backup = filemgr.nand
 
-        backup_folder_path = os.path.join(__ROOT__, "backup", GameName)
+        backup_folder_path = os.path.join(__LOCAL__, "backup", GameName)
 
         try:
             os.makedirs(backup_folder_path, exist_ok=True)
@@ -484,6 +484,9 @@ class FileManager:
 
             log.warning(f"Creating {modName} config File Path... {ini_file_path}\n")
 
+            if not filemgr.is_extracting:
+                save_config_path(filemgr._manager, filemgr._manager.config, ini_file_path)
+
             log.info(f"Opening {modName} config file...")
 
             keys_list = set()
@@ -500,10 +503,7 @@ class FileManager:
                 config = configparser.ConfigParser()
                 config.optionxform = lambda option: option
 
-                if (configName != "Keys"):
-                    configFile = os.path.join(ini_file_path, configName + ".ini")
-                else:
-                    configFile = ini_file_path ## compatibility for old patches
+                configFile = mod_config_file(ini_file_path, configName)
 
                 os.makedirs(os.path.dirname(configFile), exist_ok=True)
 

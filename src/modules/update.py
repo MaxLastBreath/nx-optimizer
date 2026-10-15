@@ -122,7 +122,7 @@ def apply_update(assets):
 
 
 def delete_old_exe():
-    exe_to_rename = sys.argv[0]
+    exe_to_rename = os.environ.get("APPIMAGE", sys.argv[0])
     current = os.path.basename(exe_to_rename)
 
     # Skip if running from Python script
