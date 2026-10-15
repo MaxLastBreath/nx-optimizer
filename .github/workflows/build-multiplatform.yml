@@ -26,7 +26,7 @@ jobs:
           os: ubuntu-22.04
           artifactsPath: ./src/dist/*.AppImage
         - name: MacOS Intel
-          os: macos-13
+          os: macos-15-intel
           artifactsPath: ./src/dist/*.zip
         - name: MacOS Silicon
           os: macos-latest
@@ -50,12 +50,12 @@ jobs:
       run: |
         cd ./src/
         python ./compile_onedir.py
-      if: ${{ endsWith(matrix.name, 'dir') || startsWith(matrix.name, 'MacOS') }}
+      if: ${{ startsWith(matrix.name, 'MacOS') }}
     - name: Build ${{ matrix.name }}
       run: |
         cd ./src/
         python ./compile.py
-      if: ${{ !endsWith(matrix.name, 'dir') && !startsWith(matrix.name, 'MacOS') && !endsWith(matrix.name, 'nuitka') }}
+      if: ${{ !startsWith(matrix.name, 'MacOS') }}
     - name: Upload artifacts
       uses: actions/upload-artifact@v4.6.0
       with:

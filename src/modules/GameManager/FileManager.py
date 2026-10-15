@@ -312,15 +312,6 @@ class FileManager:
             folder_to_backup = filemgr.nand
 
         backup_folder_path = os.path.join(__LOCAL__, "backup", GameName)
-
-        try:
-            os.makedirs(backup_folder_path, exist_ok=True)
-        except PermissionError as e:
-            log.error(
-                f"The Optimizer doesn't have permission to create or copy folders, please move it to a different location then {os.getcwd()}"
-            )
-            return
-
         backup_file = f"{GameName} {datetime.now().strftime('%Y-%m-%d %H.%M.%S')}.zip"
 
         # Construct the full path for the backup file inside the 'backup' folder
@@ -329,16 +320,17 @@ class FileManager:
         try:
             # Check if the folder exists before creating the backup
             if os.path.exists(folder_to_backup):
+                os.makedirs(backup_folder_path, exist_ok=True)
                 shutil.make_archive(backup_file_path, "zip", folder_to_backup)
                 os.rename(backup_file_path + ".zip", backup_file_path)
                 messagebox.showinfo(
-                    "Backup", f"Backup created successfully: {backup_file}"
+                    "Backup", f"Backup created successfully: {backup_file_path}"
                 )
             else:
                 messagebox.showerror("Backup Error", "Folder to backup not found.")
 
         except Exception as e:
-            log.error(f"Backup Error", f"Error creating backup: {e}")
+            log.error(f"Error creating backup: {e}")
             messagebox.showerror("Backup Error", f"Error creating backup: {e}")
 
     @classmethod
