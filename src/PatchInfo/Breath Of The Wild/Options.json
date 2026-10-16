@@ -84,16 +84,10 @@
             "Section": "main",
             "Auto": false,
             "Name_Values": [
-                "720p",
-                "900p",
-                "1080p",
-                "1152p"
+                "720p"
             ],
             "Values": [
-                "1280x720",
-                "1600x900",
-                "1920x1080",
-                "2048x1152"
+                "1280x720"
             ],
             "Default": 2,
             "Description": "UltraCam Beyond NEW Resolution Scaling uses internal resolution\nWARNING: ANYTHING OVER 1440P REQUIRES EXTENDED MEMORY",
