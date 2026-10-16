@@ -395,6 +395,9 @@ class Cheats:
     def SaveCheatsConfig(cls):
         """Save Current Cheats config"""
 
+        config = configparser.ConfigParser()
+        config.read(Cheats._manager.config, encoding="utf-8")
+
         config[f"Cheats {Cheats._patchInfo.ID}"] = {}
 
         for option_name, option_var in Cheats.CheatsInfo.items():

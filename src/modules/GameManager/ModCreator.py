@@ -258,11 +258,12 @@ class ModCreator:
             return
 
         if NxMode.isLegacy():
-            # for emulator scale
+            # resolution_setup enum: 0.5X, 0.75X, 1X, 1.5X, 2X, 3X, 4X
             new_scale = 2
             if (Manager._patchInfo.ResolutionScale):
                 emuscale = int(Manager._EmulatorScale.get())
-                new_scale += emuscale - 1
+                if emuscale > 1:
+                    new_scale = emuscale + 2
 
             # eden/citron-neo insert an extra entry at the start of the resolution_setup enum
             emuName = FileMgr.LegacyEmuName()

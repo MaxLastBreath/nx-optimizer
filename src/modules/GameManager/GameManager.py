@@ -61,6 +61,8 @@ class Game_Manager:
 
         for folder in os.listdir(patch_directory):
             patchfolder = os.path.join(patch_directory, folder)
+            if not os.path.isdir(patchfolder):
+                continue
             cls.CreatePatchInfo(patchfolder)
 
     @classmethod

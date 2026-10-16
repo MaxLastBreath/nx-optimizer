@@ -60,7 +60,7 @@ def apply_preset(Manager, preset_options: dict):
                 apply_choice(Manager, patch_dict, option_key, patch_dict["Default"])
 
         for option_key, option_value in preset_options.items():
-            if option_key.lower() in Manager.UserChoices:
+            if option_key.lower() in Manager.UserChoices and option_key.lower() in patch_info:
                 patch_dict = patch_info[option_key.lower()]
                 apply_choice(Manager, patch_dict, option_key, option_value)
             else:
@@ -193,7 +193,7 @@ def save_user_choices(Manager, config_file, Legacy_path=None):
     log.info(f"Saving user choices in {localconfig}")
     config = configparser.ConfigParser()
     if os.path.exists(config_file):
-        config.read(config_file)
+        config.read(config_file, encoding="utf-8")
 
     # This is only required for the UI and FP mods.
     if not config.has_section("Options"):

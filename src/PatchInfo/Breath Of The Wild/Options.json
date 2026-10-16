@@ -214,16 +214,13 @@
             "Auto": false,
             "Name_Values": [
                 "Kakariko",
-                "Great Sky Island",
-                "Lookout Landing",
-                "Goron City",
-                "Korok Forest"
+                "Korok Forest",
+                "Zora Domain"
             ],
             "Values": [
                 0,
                 1,
-                2,
-                3
+                2
             ],
             "Default": 1,
             "Description": "UltraCam Beyond preset default benchmark.\nTrigger when you press G",
