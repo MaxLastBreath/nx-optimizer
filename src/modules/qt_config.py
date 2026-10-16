@@ -1,7 +1,6 @@
 import configparser
 import os
 import re
-import platform
 from modules.logger import *
 from configparser import Interpolation
 
@@ -51,7 +50,7 @@ def find_title_id_index(config, config_title_id):
         return None
     else:
         for key, value in config.items(section):
-            if value == config_title_id:
+            if value == str(config_title_id):
                 TitleIndexnum = key.split("\\")[0]
                 return TitleIndexnum
     return None
@@ -162,20 +161,16 @@ def add_entry(configdir, directory, config, config_title_id, entry_to_add):
 def modify_disabled_key(
     configdir, directory, config, config_title_id, entry, action="add"
 ):
-    if platform.system() == "Linux":
-        return
-
     if config == None:
         return
 
     try:
-        if platform.system() == "Windows":
-            if action == "add":
-                print("Disabling mod:", entry, config_title_id)
-                add_entry(configdir, directory, config, config_title_id, entry)
-            if action == "remove":
-                print("Enabling mod:", entry, config_title_id)
-                find_and_remove_entry(configdir, directory, config, config_title_id, entry)
+        if action == "add":
+            print("Disabling mod:", entry, config_title_id)
+            add_entry(configdir, directory, config, config_title_id, entry)
+        if action == "remove":
+            print("Enabling mod:", entry, config_title_id)
+            find_and_remove_entry(configdir, directory, config, config_title_id, entry)
     except configparser.InterpolationSyntaxError as e:
         log.error(f"Failed to Patch Config files, likely due to a %% character in one of the mods {e}")
 

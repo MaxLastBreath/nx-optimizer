@@ -10,7 +10,7 @@ if platform.system() == "Darwin":
     localconfig = os.path.join(macos_path, CONFIG_FILE_LOCAL_OPTIMIZER)
 
 config = configparser.ConfigParser()
-config.read(CONFIG_FILE_LOCAL_OPTIMIZER)
+config.read(CONFIG_FILE_LOCAL_OPTIMIZER, encoding="utf-8")
 w_scale = config.get("Settings", "scale", fallback="On")
 
 

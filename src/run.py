@@ -41,4 +41,4 @@ if __name__ == "__main__":
 
         window.mainloop()
     except Exception as e:
-        log.critical("ERROR AT MAIN: " + e)
+        log.critical(f"ERROR AT MAIN: {e}", exc_info=True)

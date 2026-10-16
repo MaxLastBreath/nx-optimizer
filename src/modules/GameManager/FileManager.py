@@ -14,14 +14,13 @@ import subprocess
 import shutil
 import time
 
-from run_config import __ROOT__
+from run_config import __LOCAL__
 
 
 class FileManager:
 
     _window: ttk.Window = None
     _manager: any = None
-    _emu_blacklist = ["citra-emu", "lime3ds-emu", "steam"]
     _dragfile: DragFile = None
     _emulist: list[str] = []
     _emuselect: str = None
@@ -111,19 +110,24 @@ class FileManager:
         return os.path.normpath(os.path.join(os.path.dirname(filemgr.read_configpath()), subfolder))
 
     @classmethod
+    def __EmuFoldersWith(filemgr, userDir: str, *marker: str) -> list[str]:
+        """Emulator folders under userDir that contain the marker path."""
+
+        folders = []
+        for folder in sorted(os.listdir(userDir)):
+            FolderPath = os.path.join(userDir, folder)
+            if os.path.exists(os.path.join(FolderPath, *marker)):
+                folders.append(folder)
+                superlog.info(f"Found Legacy Emu folder at: {FolderPath}")
+        return folders
+
+    @classmethod
     # fmt: off
     def __LoopSearch(filemgr) -> str:
         GameID = filemgr._manager._patchInfo.ID
 
-        filemgr._emulist = []
-
         userDir = filemgr.__UserDataRoot()
-        for folder in os.listdir(userDir):
-            FolderPath = os.path.join(userDir, folder)
-            if os.path.exists(os.path.join(FolderPath, "load", GameID)):
-                filemgr._emulist.append(folder)
-                superlog.info(f"Found Legacy Emu folder at: {FolderPath}")
-                continue
+        filemgr._emulist = filemgr.__EmuFoldersWith(userDir, "load", GameID) or filemgr.__EmuFoldersWith(userDir, "keys", "prod.keys")
 
         if len(filemgr._emulist) < 1: # Fallback to citron
             base_directory = os.path.join(userDir, "citron")
@@ -135,28 +139,6 @@ class FileManager:
 
         return base_directory
     
-    @classmethod
-    # fmt: off
-    def __LoopSearchLinuxConfig(filemgr) -> str:
-        SpecialDir = ".config"
-        userDir = os.path.join(filemgr.home_directory, SpecialDir)
-
-        for folder in os.listdir(userDir):
-
-            if folder in filemgr._emu_blacklist:
-                continue
-
-            base_directory = os.path.join(userDir, folder)
-            lookupfile = os.path.join(base_directory, "qt-config.ini")
-
-            if os.path.exists(lookupfile):
-                log.info(f"Found Config File {lookupfile}")
-                return lookupfile
-
-        log.error("Didn't find a Legacy Emulator")
-
-        return None
-        
     @classmethod
     def __RyujinxBase(filemgr) -> str:
         home = filemgr.home_directory
@@ -196,21 +178,22 @@ class FileManager:
         base_directory = filemgr.home_directory
         patchinfo = filemgr._manager._patchInfo
 
-        if (os.path.exists(portablefolder) and portablefolder != "AppData"):
+        is_portable = os.path.exists(portablefolder) and portablefolder != "AppData"
+        if is_portable:
             base_directory = portablefolder
-        else: 
+        else:
             base_directory = filemgr.__LoopSearch()
-        
+
         log.info(portablefolder)
 
-        # Config FIle BS
-        if (filemgr.os_platform == "Linux"):
-            filemgr._emuconfig = filemgr.__LoopSearchLinuxConfig()
-            if (filemgr._emuconfig == None): 
-                NxMode.switch()
-                return
-        else:
-            filemgr._emuconfig = os.path.join(base_directory, "config/qt-config.ini")
+        filemgr._emuconfig = os.path.join(base_directory, "config", "qt-config.ini")
+        if filemgr.os_platform == "Linux" and not is_portable:
+            filemgr._emuconfig = os.path.join(filemgr.home_directory, ".config", os.path.basename(base_directory), "qt-config.ini")
+
+        if filemgr.os_platform == "Linux" and not os.path.exists(filemgr._emuconfig):
+            log.error(f"Didn't find a Legacy Emulator config at {filemgr._emuconfig}")
+            NxMode.switch()
+            return
 
         filemgr._emuglobal = base_directory
         filemgr.nand = os.path.normpath(os.path.join(base_directory, "nand"))
@@ -311,16 +294,7 @@ class FileManager:
         elif NxMode.isRyujinx():
             folder_to_backup = filemgr.nand
 
-        backup_folder_path = os.path.join(__ROOT__, "backup", GameName)
-
-        try:
-            os.makedirs(backup_folder_path, exist_ok=True)
-        except PermissionError as e:
-            log.error(
-                f"The Optimizer doesn't have permission to create or copy folders, please move it to a different location then {os.getcwd()}"
-            )
-            return
-
+        backup_folder_path = os.path.join(__LOCAL__, "backup", GameName)
         backup_file = f"{GameName} {datetime.now().strftime('%Y-%m-%d %H.%M.%S')}.zip"
 
         # Construct the full path for the backup file inside the 'backup' folder
@@ -329,16 +303,17 @@ class FileManager:
         try:
             # Check if the folder exists before creating the backup
             if os.path.exists(folder_to_backup):
+                os.makedirs(backup_folder_path, exist_ok=True)
                 shutil.make_archive(backup_file_path, "zip", folder_to_backup)
                 os.rename(backup_file_path + ".zip", backup_file_path)
                 messagebox.showinfo(
-                    "Backup", f"Backup created successfully: {backup_file}"
+                    "Backup", f"Backup created successfully: {backup_file_path}"
                 )
             else:
                 messagebox.showerror("Backup Error", "Folder to backup not found.")
 
         except Exception as e:
-            log.error(f"Backup Error", f"Error creating backup: {e}")
+            log.error(f"Error creating backup: {e}")
             messagebox.showerror("Backup Error", f"Error creating backup: {e}")
 
     @classmethod
@@ -484,8 +459,8 @@ class FileManager:
 
             log.warning(f"Creating {modName} config File Path... {ini_file_path}\n")
 
-            ini_file_directory = os.path.dirname(ini_file_path)
-            os.makedirs(ini_file_directory, exist_ok=True)
+            if not filemgr.is_extracting:
+                save_config_path(filemgr._manager, filemgr._manager.config, ini_file_path)
 
             log.info(f"Opening {modName} config file...")
 
@@ -503,10 +478,9 @@ class FileManager:
                 config = configparser.ConfigParser()
                 config.optionxform = lambda option: option
 
-                if (configName != "Keys"):
-                    configFile = os.path.join(ini_file_path, configName + ".ini")
-                else:
-                    configFile = ini_file_path ## compatibility for old patches
+                configFile = mod_config_file(ini_file_path, configName)
+
+                os.makedirs(os.path.dirname(configFile), exist_ok=True)
 
                 if os.path.exists(configFile):
                     config.read(configFile, encoding="utf-8")
@@ -569,7 +543,7 @@ class FileManager:
         filemgr.mod_whitelist = set(filemgr.mod_whitelist)
 
         # Run the Main code to Enable and Disable necessary Mods, the remove ensures the mods are enabled.
-        if NxMode.isLegacy():
+        if NxMode.isLegacy() and not filemgr.is_extracting:
 
             # read config to pass into disabled keys h
             emuconfig = configparser.ConfigParser()

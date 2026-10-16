@@ -21,7 +21,7 @@ class Setting:
         self._manager = manager
         self.Colors = Color()
         self.config = configparser.ConfigParser()
-        self.config.read(localconfig)
+        self.config.read(localconfig, encoding="utf-8")
 
     def settingswindow(self, style, canvases):
         self.style = style

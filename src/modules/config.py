@@ -1,6 +1,6 @@
 import shutil
 from configuration.settings import *
-import os, json
+import os, json, re
 
 from modules.FrontEnd.FrontEndMode import NxMode
 
@@ -8,14 +8,11 @@ from modules.FrontEnd.FrontEndMode import NxMode
 def dropdown_name(patch_dict, index):
     return patch_dict["Name_Values"][int(index)]
 
-def dropdown_index(patch_dict, name):
-    return patch_dict["Name_Values"].index(name)
-
 def apply_choice(Manager, patch_dict, option_key, value):
     "Resolve a dropdown/scale/bool value and set it on UserChoices."
 
     patch_class = patch_dict["Class"]
-    key = option_key.lower()
+    key = option_key if option_key in Manager.UserChoices else option_key.lower()
 
     if patch_class == "dropdown":
         Manager.UserChoices[key].set(dropdown_name(patch_dict, value))
@@ -63,99 +60,140 @@ def apply_preset(Manager, preset_options: dict):
                 apply_choice(Manager, patch_dict, option_key, patch_dict["Default"])
 
         for option_key, option_value in preset_options.items():
-            if option_key.lower() in Manager.UserChoices:
+            if option_key.lower() in Manager.UserChoices and option_key.lower() in patch_info:
                 patch_dict = patch_info[option_key.lower()]
                 apply_choice(Manager, patch_dict, option_key, option_value)
             else:
                 continue
 
-def setGameConfig(Manager, config):
-    # UltraCam Beyond new patches.
-    for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
-        patch_info = value
-        sectionName = Manager._patchInfo.ID
+GAME_KEYS = ["emuscale", "configpath"]
 
-        if not config.has_section(sectionName):
-            config.add_section(sectionName)
+def clear_game_values(Manager, config):
+    "Option values live in the mod's own config now, drop any stale copies kept by older versions."
 
-        for patch in Manager.UserChoices:
-            try:
-                patch_dict = patch_info[patch]
-            except Exception as e:
-                continue
+    GameID = Manager._patchInfo.ID
 
-            patch_class = patch_dict["Class"]
+    if not config.has_section(GameID):
+        config.add_section(GameID)
+        return
 
-            if Manager.UserChoices[patch] == "auto":
-                config.set(sectionName, patch, str(patch_dict["Default"]))
-                continue
-            elif Manager.UserChoices[patch].get() == "auto":
-                config.set(sectionName, patch, str(patch_dict["Default"]))
-                continue
+    if not config.get(GameID, "configpath", fallback=None):
+        return
 
-            if patch_class.lower() == "dropdown":
-                index = dropdown_index(patch_dict, Manager.UserChoices[patch].get())
-                config.set(sectionName, patch, str(index))
-                continue
+    for option in config.options(GameID):
+        if option in GAME_KEYS:
+            continue
+        config.remove_option(GameID, option)
 
-            config.set(sectionName, patch, Manager.UserChoices[patch].get())
+def save_config_path(Manager, config_file, config_path):
+    "Records where the mod config was last written so it can be read back on the next launch."
+
+    config = configparser.ConfigParser()
+    config.read(config_file, encoding="utf-8")
+
+    GameID = Manager._patchInfo.ID
+    if not config.has_section(GameID):
+        config.add_section(GameID)
+
+    config.set(GameID, "configpath", config_path)
+
+    with open(config_file, "w", encoding="utf-8") as file:
+        config.write(file)
+
+def mod_config_file(config_path, config_name):
+    "Path of a single mod config, mirroring how the patcher lays them out."
+
+    if config_name == "Keys":
+        return config_path ## compatibility for old patches
+    return os.path.join(config_path, config_name + ".ini")
+
+def read_mod_config(config_path, config_name):
+    "Reads one of the mod's own .ini files, None when it was never written."
+
+    config_file = mod_config_file(config_path, config_name)
+    if not os.path.exists(config_file):
+        return None
+
+    config = configparser.ConfigParser()
+    config.optionxform = lambda option: option
+    config.read(config_file, encoding="utf-8")
+    return config
+
+def vector_index(patch_dict, pair):
+    "Matches a Width/Height pair read back from a mod config to its dropdown entry."
+
+    target = [str(int(float(number))) for number in pair]
+
+    for index, entry in enumerate(patch_dict["Values"]):
+        if isinstance(entry, str):
+            numbers = re.findall(r"\d+(?:\.\d+)?", entry)
+        else:
+            numbers = entry
+        if [str(int(float(number))) for number in numbers[:2]] == target:
+            return index
+    return None
+
+def load_mod_choice(Manager, config, patch_dict, option_key):
+    "Restores a single UserChoice from the value the patcher wrote into the mod config."
+
+    Config_Class = patch_dict["Config_Class"]
+    section = Config_Class[0]
+
+    if not config.has_section(section):
+        return
+
+    if len(Config_Class) == 3:
+        pair = [config.get(section, key, fallback=None) for key in Config_Class[1:]]
+        if None in pair:
+            return
+        index = vector_index(patch_dict, pair)
+        if index is None:
+            return
+        apply_choice(Manager, patch_dict, option_key, index)
+        return
+
+    value = config.get(section, Config_Class[1], fallback=None)
+    if value is None:
+        return
+
+    if patch_dict["Class"].lower() == "dropdown":
+        values = [str(entry) for entry in patch_dict["Values"]]
+        if value not in values:
+            return
+        apply_choice(Manager, patch_dict, option_key, values.index(value))
+        return
+
+    apply_choice(Manager, patch_dict, option_key, value)
 
 def loadGameConfig(Manager, config):
-    # Load UltraCam Beyond new patches.
-    for i, (key, value) in enumerate(Manager.UltracamPatchJson.items()):
-        patch_info = value
-        GameID = Manager._patchInfo.ID
-
+    # Load UltraCam Beyond new patches from the mod configs the patcher last wrote.
+    for key, value in Manager.UltracamPatchJson.items():
         for itemName in value:
             Manager.UserConfigs[itemName] = key
 
-        if not config.has_section(GameID):
-            return
+    GameID = Manager._patchInfo.ID
+    Manager._EmulatorScale.set(config.get(GameID, "emuscale", fallback=1))
+
+    config_path = config.get(GameID, "configpath", fallback=None)
+    if not config_path:
+        return
+
+    for key, patch_info in Manager.UltracamPatchJson.items():
+        modconfig = read_mod_config(config_path, key)
+        if modconfig is None:
+            continue
 
         for patch in Manager.UserChoices:
-            try:
-                patch_dict = patch_info[patch]
-            except Exception as e:
+            patch_dict = patch_info.get(patch)
+            if patch_dict is None:
                 continue
-
-            patch_class = patch_dict["Class"]
-            patch_default = patch_dict["Default"]
-            if patch_class.lower() == "dropdown":
-                try:
-                    PatchIndex = int(config.get(GameID, patch))
-                    Manager.UserChoices[patch].set(dropdown_name(patch_dict, PatchIndex))
-                except (configparser.NoOptionError, KeyError):
-                    pass
-                except ValueError:
-                    if config[Manager._patchInfo.ID][patch] == "auto":
-                        Manager.UserChoices[patch].set(dropdown_name(patch_dict, patch_default))
-                        continue
-                continue
-            if patch_class.lower() == "scale":
-                # use name for tag accuracy
-                Manager.maincanvas.itemconfig(patch_dict["Name"], text=Manager.UserChoices[patch].get())
-            try:
-                patch_type = patch_dict["Type"]
-
-                if patch_type == "f32":
-                    Manager.UserChoices[patch].set(float(config.get(GameID, patch)))
-                else:
-                    Manager.UserChoices[patch].set(config.get(GameID, patch))
-            except (configparser.NoOptionError, KeyError):
-                pass
-            try:
-                if patch_class.lower() == "bool":
-                    Manager.UserChoices[patch].set(config.get(GameID, patch))
-            except (configparser.NoOptionError, KeyError):
-                pass
-        
-        Manager._EmulatorScale.set(config.get(GameID, "emuscale", fallback=1))
+            load_mod_choice(Manager, modconfig, patch_dict, patch)
 
 def save_user_choices(Manager, config_file, Legacy_path=None):
     log.info(f"Saving user choices in {localconfig}")
     config = configparser.ConfigParser()
     if os.path.exists(config_file):
-        config.read(config_file)
+        config.read(config_file, encoding="utf-8")
 
     # This is only required for the UI and FP mods.
     if not config.has_section("Options"):
@@ -163,7 +201,7 @@ def save_user_choices(Manager, config_file, Legacy_path=None):
     # config['Options']['UI'] = Manager.ui_var.get()
     # config['Options']['First Person'] = Manager.fp_var.get()
 
-    setGameConfig(Manager, config)
+    clear_game_values(Manager, config)
 
     # Save the enable/disable choices
     for option_name, option_var in Manager.selected_options.items():

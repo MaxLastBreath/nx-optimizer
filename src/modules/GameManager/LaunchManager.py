@@ -92,10 +92,11 @@ class LaunchManager:
                 Ryujinx_PATH = manager.select_Legacy_exe()
                 if Ryujinx_PATH is None:
                     log.warning("Ryujinx wasn't found.")
+                    return
             
             if (read_ryujinx_version(FileManager._emuconfig) >= 60):
                 cmd = [f'{Ryujinx_PATH}', "--no-gui", "--fullscreen", f'{Game_PATH}']
             else:
                 cmd = [f"{Ryujinx_PATH}", "-f", f"{Game_PATH}"]
         log.info(f"Launching : {cmd}")
-        subprocess.Popen(cmd, shell=True)
+        subprocess.Popen(cmd)

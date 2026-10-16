@@ -76,8 +76,8 @@
       "Section": "extra",
       "Auto": false,
       "Name_Values": ["Slow", "Default", "Fast", "Really Fast"],
-      "Values": ["{0.75, 0.75}", "{1.00, 1.00}", "{2.0, 1.5}, {3.0, 2.0}"],
-      "Default": 0,
+      "Values": ["{0.75, 0.75}", "{1.00, 1.00}", "{2.0, 1.5}", "{3.0, 2.0}"],
+      "Default": 1,
       "Description": "Multiplier for horizontal and vertical camera speeds.",
       "Config_Class": ["Features", "GameCameraSpeed"]
     },

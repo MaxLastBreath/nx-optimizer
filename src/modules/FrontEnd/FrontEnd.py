@@ -665,31 +665,27 @@ class Manager:
                 filetypes=[("Executable files", "*.exe"), ("All Files", "*.*")],
             )
 
+            if not Legacy_path:
+                return None
+
             executable_name = Legacy_path
             if executable_name.endswith("Ryujinx.exe") or executable_name.endswith("Ava.exe"):
                 NxMode.set("Ryujinx")
             else:
                 NxMode.set("Legacy")
 
-            if Legacy_path:
-                # Save the selected Legacy.exe path to a configuration file
-                save_user_choices(Manager, Manager.config, Legacy_path)
-                home_directory = os.path.dirname(Legacy_path)
-                fullpath = os.path.dirname(Legacy_path)
-                if any(item in os.listdir(fullpath) for item in ["user", "portable"]):
-                    superlog.info(
-                        f"Successfully selected {NxMode.get()}.exe! And a portable folder was found at {home_directory}!"
-                    )
-                    FileManager.checkpath()
-                    return Legacy_path
-                else:
-                    superlog.info(
-                        f"Portable folder for {NxMode.get()} not found defaulting to appdata directory!"
-                    )
-                    FileManager.checkpath()
-                    return Legacy_path
+            save_user_choices(Manager, Manager.config, Legacy_path)
+            fullpath = os.path.dirname(Legacy_path)
+            if any(item in os.listdir(fullpath) for item in ["user", "portable"]):
+                superlog.info(
+                    f"Successfully selected {NxMode.get()}.exe! And a portable folder was found at {fullpath}!"
+                )
             else:
-                return None
+                superlog.info(
+                    f"Portable folder for {NxMode.get()} not found defaulting to appdata directory!"
+                )
+            FileManager.checkpath()
+            return Legacy_path
 
         if Manager.os_platform == "Linux":
             Legacy_path = filedialog.askopenfilename(
@@ -700,6 +696,9 @@ class Manager:
                 ],
             )
 
+            if not Legacy_path:
+                return None
+
             executable_name = os.path.basename(Legacy_path)
 
             if executable_name.startswith("Ryujinx") or executable_name.startswith(
@@ -708,7 +707,7 @@ class Manager:
                 NxMode.set("Ryujinx")
 
             save_user_choices(Manager, Manager.config, Legacy_path)
-        return Legacy_path
+            return Legacy_path
 
     def Create_Canvases(Manager):
         # Main
