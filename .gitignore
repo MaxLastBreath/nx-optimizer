@@ -36,3 +36,15 @@ src/run.dist.zip
 src/TOTKOptimizer.ini
 TOTKOptimizer.ini
 NX Optimizer.AppImage
+# build/runtime
+.venv/
+build/
+dist/
+Extracted Files/
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+.idea/
+.vscode/
+*.log

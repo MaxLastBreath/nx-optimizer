@@ -1,42 +1,38 @@
-import threading
-from time import sleep
 from modules.logger import log
 from collections import deque
+
+_INTERVAL_MS = 400
 
 
 class AnimationQueue:
     isInit: bool = False
     queue = deque()
-
-    __running: bool = True
-    __lock = threading.Lock()
+    _master = None
 
     @classmethod
-    def Initialize(cls):
-
+    def Initialize(cls, master):
         log.warning("Initialize AnimationQueue")
-
         if cls.isInit:
             raise ("Already Initialized.")
-
-        thread = threading.Thread(name="AnimationQueue", target=cls.UpdateQueue)
-        thread.daemon = True
-        thread.start()
+        cls._master = master
+        cls._schedule()
         cls.isInit = True
 
     @classmethod
     def AddToQueue(cls, func):
-        with cls.__lock:
-            cls.queue.append(func)
+        cls.queue.append(func)
 
     @classmethod
-    def UpdateQueue(cls):
-        while cls.__running:
-            with cls.__lock:
-                if len(cls.queue) > 0:
-                    queue = cls.queue.copy()
+    def _schedule(cls):
+        cls._master.after(_INTERVAL_MS, cls._tick)
 
-                    for func in queue:
-                        func()
+    @classmethod
+    def _tick(cls):
+        if not cls.queue:
+            cls._schedule()
+            return
 
-            sleep(0.15)
+        for func in cls.queue:
+            func()
+        
+        cls._schedule()
